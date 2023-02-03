@@ -13,10 +13,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Clean Scratch Dir
+    - name: Clean Directories
       shell: bash
       run: |
-        rm -Rf ${{ inputs.scratch-dir }} && mkdir -p ${{ inputs.scratch-dir }}
+        rm -Rf ${{ inputs.scratch-dir }} && mkdir -p ${{ inputs.scratch-dir }} ${{ inputs.cache-source }}
     - name: Prepare Timestamp for Layer Cache Busting
       shell: bash
       run: |
