@@ -1,0 +1,46 @@
+name: Extract Cache
+description: "Extracts the cached data from the docker build(x|kit) process"
+inputs:
+  cache-source:
+    default: cache
+    description: "Where the cache is stored in the calling workspace. Default: `cache`"
+  cache-target:
+    default: /root/.cache/go-build
+    description: "Where the cache is stored in the docker container. Default: `/root/.cache/go-build`"
+  scratch-dir:
+    default: scratch
+    description: "Where the action is stores some temporary files for its processing. Default: `scratch`"
+runs:
+  using: composite
+  steps:
+    - name: Prepare Timestamp for Layer Cache Busting
+      shell: bash
+      run: |
+        date --iso=ns | tee ${{ inputs.scratch-dir }}/buildstamp
+    - name: Prepare Dancefile to Access Caches
+      shell: bash
+      run: |
+        cat > ${{ inputs.scratch-dir }}/Dancefile.extract <<EOF
+        FROM alpine:3.17
+        COPY ${{ inputs.scratch-dir }}/buildstamp buildstamp
+        RUN --mount=type=cache,target=${{ inputs.cache-target }} \
+            mkdir -p /var/dance-cache/ \
+            && cp -R ${{ inputs.cache-target }}/* /var/dance-cache/ || true
+        EOF
+        cat ${{ inputs.scratch-dir }}/Dancefile.extract
+    - name: Extract Data into Docker Image
+      shell: bash
+      run: |
+        docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.extract --tag dance:extract --load .
+    - name: Create Extraction Image
+      shell: bash
+      run: |
+        docker rm -f cache-container && docker create -ti --name cache-container dance:extract
+    - name: Unpack Docker Image into Scratch
+      shell: bash
+      run: |
+          docker cp -L cache-container:/var/dance-cache - | tar -x -m -C ${{ inputs.scratch-dir }}
+    - name: Move Cache into Its Place
+      shell: bash
+      run: |
+        rm -rf ${{ inputs.cache-source }} && mv ${{ inputs.scratch-dir }}/dance-cache ${{ inputs.cache-source }}
