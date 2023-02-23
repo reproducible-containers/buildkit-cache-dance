@@ -43,4 +43,5 @@ runs:
     - name: Move Cache into Its Place
       shell: bash
       run: |
-        rm -rf ${{ inputs.cache-source }} && mv ${{ inputs.scratch-dir }}/dance-cache ${{ inputs.cache-source }}
+        sudo rm -rf ${{ inputs.cache-source }}
+        mv ${{ inputs.scratch-dir }}/dance-cache ${{ inputs.cache-source }}
