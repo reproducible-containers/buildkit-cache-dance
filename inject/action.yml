@@ -26,7 +26,7 @@ runs:
       run: |
         cat > ${{ inputs.scratch-dir }}/Dancefile.inject <<EOF
         FROM busybox:1
-        COPY ${{ inputs.scratch-dir }}/buildstamp buildstamp
+        COPY buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             --mount=type=bind,source=.,target=/var/dance-cache \
             cp -R /var/dance-cache/* ${{ inputs.cache-target }} || true
