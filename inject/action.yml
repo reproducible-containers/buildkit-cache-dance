@@ -28,11 +28,11 @@ runs:
         FROM busybox:1
         COPY ${{ inputs.scratch-dir }}/buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
-            --mount=type=bind,source=${{ inputs.cache-source }},target=/var/dance-cache \
+            --mount=type=bind,source=.,target=/var/dance-cache \
             cp -R /var/dance-cache/* ${{ inputs.cache-target }} || true
         EOF
         cat ${{ inputs.scratch-dir }}/Dancefile.inject
     - name: Inject Data into Docker Cache
       shell: bash
       run: |
-        docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.inject --tag dance:inject .
+        docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.inject --tag dance:inject ${{ inputs.cache-source }}

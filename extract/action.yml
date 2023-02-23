@@ -22,7 +22,7 @@ runs:
       run: |
         cat > ${{ inputs.scratch-dir }}/Dancefile.extract <<EOF
         FROM busybox:1
-        COPY ${{ inputs.scratch-dir }}/buildstamp buildstamp
+        COPY buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             mkdir -p /var/dance-cache/ \
             && cp -R ${{ inputs.cache-target }}/* /var/dance-cache/ || true
@@ -31,7 +31,7 @@ runs:
     - name: Extract Data into Docker Image
       shell: bash
       run: |
-        docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.extract --tag dance:extract --load .
+        docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.extract --tag dance:extract --load ${{ inputs.scratch-dir }}
     - name: Create Extraction Image
       shell: bash
       run: |
