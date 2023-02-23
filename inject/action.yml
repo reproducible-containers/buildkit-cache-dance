@@ -36,3 +36,7 @@ runs:
       shell: bash
       run: |
         docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.inject --tag dance:inject ${{ inputs.cache-source }}
+    - name: Clean Directories
+      shell: bash
+      run: |
+        sudo rm -rf ${{ inputs.cache-source }}
