@@ -39,7 +39,7 @@ runs:
     - name: Unpack Docker Image into Scratch
       shell: bash
       run: |
-          docker cp -L cache-container:/var/dance-cache - | tar -x -m -C ${{ inputs.scratch-dir }}
+        docker cp -L cache-container:/var/dance-cache - | tar -x -m -C ${{ inputs.scratch-dir }}
     - name: Move Cache into Its Place
       shell: bash
       run: |
