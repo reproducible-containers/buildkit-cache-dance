@@ -29,7 +29,7 @@ runs:
         COPY buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             --mount=type=bind,source=.,target=/var/dance-cache \
-            cp -R /var/dance-cache/* ${{ inputs.cache-target }} || true
+            cp -R /var/dance-cache/. ${{ inputs.cache-target }} || true
         EOF
         cat ${{ inputs.scratch-dir }}/Dancefile.inject
     - name: Inject Data into Docker Cache

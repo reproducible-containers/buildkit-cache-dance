@@ -25,7 +25,7 @@ runs:
         COPY buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             mkdir -p /var/dance-cache/ \
-            && cp -R ${{ inputs.cache-target }}/* /var/dance-cache/ || true
+            && cp -R ${{ inputs.cache-target }}/. /var/dance-cache/ || true
         EOF
         cat ${{ inputs.scratch-dir }}/Dancefile.extract
     - name: Extract Data into Docker Image
