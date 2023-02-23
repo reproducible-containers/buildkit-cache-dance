@@ -21,7 +21,7 @@ runs:
       shell: bash
       run: |
         cat > ${{ inputs.scratch-dir }}/Dancefile.extract <<EOF
-        FROM alpine:3.17
+        FROM busybox:1
         COPY ${{ inputs.scratch-dir }}/buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             mkdir -p /var/dance-cache/ \

@@ -25,7 +25,7 @@ runs:
       shell: bash
       run: |
         cat > ${{ inputs.scratch-dir }}/Dancefile.inject <<EOF
-        FROM alpine:3.17
+        FROM busybox:1
         COPY ${{ inputs.scratch-dir }}/buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             --mount=type=bind,source=${{ inputs.cache-source }},target=/var/dance-cache \
