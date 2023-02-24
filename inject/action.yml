@@ -20,7 +20,7 @@ runs:
     - name: Prepare Timestamp for Layer Cache Busting
       shell: bash
       run: |
-        date --iso=ns | tee ${{ inputs.scratch-dir }}/buildstamp
+        date --iso=ns | tee ${{ inputs.cache-source }}/buildstamp
     - name: Prepare Dancefile to Access Caches
       shell: bash
       run: |
