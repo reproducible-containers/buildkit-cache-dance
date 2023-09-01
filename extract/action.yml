@@ -25,7 +25,7 @@ runs:
         COPY buildstamp buildstamp
         RUN --mount=type=cache,target=${{ inputs.cache-target }} \
             mkdir -p /var/dance-cache/ \
-            && cp -R ${{ inputs.cache-target }}/. /var/dance-cache/ || true
+            && cp -p -R ${{ inputs.cache-target }}/. /var/dance-cache/ || true
         EOF
         cat ${{ inputs.scratch-dir }}/Dancefile.extract
     - name: Extract Data into Docker Image
@@ -39,7 +39,7 @@ runs:
     - name: Unpack Docker Image into Scratch
       shell: bash
       run: |
-        docker cp -L cache-container:/var/dance-cache - | tar -x -m -C ${{ inputs.scratch-dir }}
+        docker cp -L cache-container:/var/dance-cache - | tar -H posix -x -C ${{ inputs.scratch-dir }}
     - name: Move Cache into Its Place
       shell: bash
       run: |
