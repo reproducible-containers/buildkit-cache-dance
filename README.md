@@ -40,8 +40,8 @@ jobs:
           path: go-build-cache
           key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
 
-      - name: inject go-build-cache into docker
-        uses: reproducible-containers/buildkit-cache-dance/inject@main
+      - name: inject/extract go-build-cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@main
         with:
           cache-source: go-build-cache
 
@@ -56,12 +56,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-
-      - name: extract go-build-cache from docker
-        uses: overmindtech/buildkit-cache-dance/extract@main
-        with:
-          cache-source: go-build-cache
-
 ```
 
 Thanks to [Alexander Pravdin](https://github.com/speller) for the basic idea in [this comment](https://github.com/moby/buildkit/issues/1512).

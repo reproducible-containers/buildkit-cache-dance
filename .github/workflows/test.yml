@@ -1,0 +1,45 @@
+---
+name: Test
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/metadata-action@v4
+        id: meta
+        with:
+          images: test
+      - name: Cache var-cache-apt
+        uses: actions/cache@v3
+        with:
+          path: var-cache-apt
+          key: var-cache-apt-${{ hashFiles('.github/workflows/test/Dockerfile') }}
+      - name: Cache var-lib-apt
+        uses: actions/cache@v3
+        with:
+          path: var-lib-apt
+          key: var-lib-apt-${{ hashFiles('.github/workflows/test/Dockerfile') }}
+      - name: inject var-cache-apt into docker
+        uses: ./
+        with:
+          cache-source: var-cache-apt
+          cache-target: /var/cache/apt
+      - name: inject var-lib-apt into docker
+        uses: ./
+        with:
+          cache-source: var-lib-apt
+          cache-target: /var/lib/apt
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .github/workflows/test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

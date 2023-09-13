@@ -1,0 +1,58 @@
+name: Inject/Extract Cache
+description: "Injects the cached data into the docker build(x|kit) process"
+inputs:
+  cache-source:
+    default: cache
+    description: "Where the cache is stored in the calling workspace. Default: `cache`"
+  cache-target:
+    default: /root/.cache/go-build
+    description: "Where the cache is stored in the docker container. Default: `/root/.cache/go-build`"
+  scratch-dir:
+    default: scratch
+    description: "Where the action is stores some temporary files for its processing. Default: `scratch`"
+runs:
+  using: composite
+  steps:
+    - uses: pyTooling/Actions/with-post-step@adef08d3bdef092282614f3b683897cefae82ee3  # v0.4.6
+      with:
+        main: |-
+          set -eux
+          # Clean Directories
+          rm -Rf ${{ inputs.scratch-dir }} && mkdir -p ${{ inputs.scratch-dir }} ${{ inputs.cache-source }}
+          # Prepare Timestamp for Layer Cache Busting
+          date --iso=ns | tee ${{ inputs.cache-source }}/buildstamp
+          # Prepare Dancefile to Access Caches
+          cat > ${{ inputs.scratch-dir }}/Dancefile.inject <<EOF
+          FROM busybox:1
+          COPY buildstamp buildstamp
+          RUN --mount=type=cache,target=${{ inputs.cache-target }} \
+              --mount=type=bind,source=.,target=/var/dance-cache \
+              cp -p -R /var/dance-cache/. ${{ inputs.cache-target }} || true
+          EOF
+          cat ${{ inputs.scratch-dir }}/Dancefile.inject
+          # Inject Data into Docker Cache
+          docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.inject --tag dance:inject ${{ inputs.cache-source }}
+          # Clean Directories
+          sudo rm -rf ${{ inputs.cache-source }}
+        post: |-
+          set -eux
+          # Prepare Timestamp for Layer Cache Busting
+          date --iso=ns | tee ${{ inputs.scratch-dir }}/buildstamp
+          # Prepare Dancefile to Access Caches
+          cat > ${{ inputs.scratch-dir }}/Dancefile.extract <<EOF
+          FROM busybox:1
+          COPY buildstamp buildstamp
+          RUN --mount=type=cache,target=${{ inputs.cache-target }} \
+              mkdir -p /var/dance-cache/ \
+              && cp -p -R ${{ inputs.cache-target }}/. /var/dance-cache/ || true
+          EOF
+          cat ${{ inputs.scratch-dir }}/Dancefile.extract
+          # Extract Data into Docker Image
+          docker buildx build -f ${{ inputs.scratch-dir }}/Dancefile.extract --tag dance:extract --load ${{ inputs.scratch-dir }}
+          # Create Extraction Image
+          docker rm -f cache-container && docker create -ti --name cache-container dance:extract
+          # Unpack Docker Image into Scratch
+          docker cp -L cache-container:/var/dance-cache - | tar -H posix -x -C ${{ inputs.scratch-dir }}
+          # Move Cache into Its Place
+          sudo rm -rf ${{ inputs.cache-source }}
+          mv ${{ inputs.scratch-dir }}/dance-cache ${{ inputs.cache-source }}
