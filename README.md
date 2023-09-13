@@ -40,8 +40,8 @@ jobs:
           path: go-build-cache
           key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
 
-      - name: inject/extract go-build-cache into docker
-        uses: reproducible-containers/buildkit-cache-dance@main
+      - name: inject go-build-cache into docker
+        uses: reproducible-containers/buildkit-cache-dance/inject@v1.0.0
         with:
           cache-source: go-build-cache
 
@@ -56,6 +56,19 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
+
+      - name: extract go-build-cache from docker
+        uses: reproducible-containers/buildkit-cache-dance/extract@v1.0.0
+        with:
+          cache-source: go-build-cache
+
 ```
 
 Thanks to [Alexander Pravdin](https://github.com/speller) for the basic idea in [this comment](https://github.com/moby/buildkit/issues/1512).
+
+## About v2.x
+
+v2.x unifies `reproducible-containers/buildkit-cache-dance/inject` and `reproducible-containers/buildkit-cache-dance/extract`
+into a single `reproducible-containers/buildkit-cache-dance` action.
+
+However, v2.x seems unstable: [`[v2] "post" steps are executed in a random order`](https://github.com/reproducible-containers/buildkit-cache-dance/issues/1)
