@@ -42,8 +42,8 @@ function run(cmd) {
 const key = "POST"
 
 if ( process.env[`STATE_${key}`] !== undefined ) { // Are we in the 'post' step?
-  run("./post");
+  run(__dirname+"/post");
 } else { // Otherwise, this is the main step
   appendFileSync(process.env.GITHUB_STATE, `${key}=true${EOL}`);
-  run("./main");
+  run(__dirname+"/main");
 }
