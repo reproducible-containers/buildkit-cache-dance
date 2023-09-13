@@ -1,0 +1,20 @@
+#!/bin/bash
+set -eux -o pipefail
+: "Argv0: $0"
+: "Clean Directories"
+rm -Rf "$(./read-action-input scratch-dir)" && mkdir -p "$(./read-action-input scratch-dir)" "$(./read-action-input cache-source)"
+: "Prepare Timestamp for Layer Cache Busting"
+date --iso=ns | tee "$(./read-action-input cache-source)"/buildstamp
+: "Prepare Dancefile to Access Caches"
+cat >"$(./read-action-input scratch-dir)"/Dancefile.inject <<EOF
+FROM busybox:1
+COPY buildstamp buildstamp
+RUN --mount=type=cache,target="$(./read-action-input cache-target)" \
+    --mount=type=bind,source=.,target=/var/dance-cache \
+    cp -p -R /var/dance-cache/. "$(./read-action-input cache-target)" || true
+EOF
+cat "$(./read-action-input scratch-dir)"/Dancefile.inject
+: "Inject Data into Docker Cache"
+docker buildx build -f "$(./read-action-input scratch-dir)"/Dancefile.inject --tag dance:inject "$(./read-action-input cache-source)"
+: "Clean Directories"
+sudo rm -rf "$(./read-action-input cache-source)"
