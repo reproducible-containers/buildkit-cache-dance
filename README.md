@@ -71,4 +71,4 @@ Thanks to [Alexander Pravdin](https://github.com/speller) for the basic idea in 
 v2.x unifies `reproducible-containers/buildkit-cache-dance/inject` and `reproducible-containers/buildkit-cache-dance/extract`
 into a single `reproducible-containers/buildkit-cache-dance` action.
 
-However, v2.x seems unstable: [`[v2] "post" steps are executed in a random order`](https://github.com/reproducible-containers/buildkit-cache-dance/issues/1)
+v2.x is still experimental.
