@@ -1,6 +1,8 @@
 # The BuildKit Cache Dance
 
-Workaround buildkit/buildx's lack of integrated caching solution
+Workaround buildkit/buildx's lack of integrated caching solution.
+
+Forked from [`overmindtech/buildkit-cache-dance`](https://github.com/overmindtech/buildkit-cache-dance/tree/306d31a77191f643c0c4a95083f36c6ddccb4a16).
 
 ```
 ---
@@ -39,7 +41,7 @@ jobs:
           key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
 
       - name: inject go-build-cache into docker
-        uses: overmindtech/buildkit-cache-dance/inject@main
+        uses: reproducible-containers/buildkit-cache-dance/inject@main
         with:
           cache-source: go-build-cache
 
