@@ -15,10 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -41,7 +38,7 @@ jobs:
           key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
 
       - name: inject go-build-cache into docker
-        uses: reproducible-containers/buildkit-cache-dance/inject@v1.0.0
+        uses: reproducible-containers/buildkit-cache-dance@v2.1.2
         with:
           cache-source: go-build-cache
 
@@ -56,19 +53,19 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64,linux/arm64
-
-      - name: extract go-build-cache from docker
-        uses: reproducible-containers/buildkit-cache-dance/extract@v1.0.0
-        with:
-          cache-source: go-build-cache
-
 ```
 
 Thanks to [Alexander Pravdin](https://github.com/speller) for the basic idea in [this comment](https://github.com/moby/buildkit/issues/1512).
 
-## About v2.x
+## Releases
+### v1
+v1 follows the original design of [`overmindtech/buildkit-cache-dance`](https://github.com/overmindtech/buildkit-cache-dance/tree/306d31a77191f643c0c4a95083f36c6ddccb4a16).
 
-v2.x unifies `reproducible-containers/buildkit-cache-dance/inject` and `reproducible-containers/buildkit-cache-dance/extract`
-into a single `reproducible-containers/buildkit-cache-dance` action.
+v1 is composed of two actions:
+- `reproducible-containers/buildkit-cache-dance/inject@v1.0.1`
+- `reproducible-containers/buildkit-cache-dance/extract@v1.0.1`
 
-v2.x is still experimental.
+See the [`releases/v1`](https://github.com/reproducible-containers/buildkit-cache-dance/tree/releases/v1) branch.
+
+### v2
+v2 is composed of the single `reproducible-containers/buildkit-cache-dance` action.
