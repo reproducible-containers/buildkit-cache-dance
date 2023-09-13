@@ -41,7 +41,7 @@ jobs:
           key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
 
       - name: inject go-build-cache into docker
-        uses: reproducible-containers/buildkit-cache-dance/inject@main
+        uses: reproducible-containers/buildkit-cache-dance/inject@v1.0.0
         with:
           cache-source: go-build-cache
 
@@ -58,7 +58,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: extract go-build-cache from docker
-        uses: overmindtech/buildkit-cache-dance/extract@main
+        uses: reproducible-containers/buildkit-cache-dance/extract@v1.0.0
         with:
           cache-source: go-build-cache
 
