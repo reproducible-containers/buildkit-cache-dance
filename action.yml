@@ -11,6 +11,6 @@ inputs:
     default: scratch
     description: "Where the action is stores some temporary files for its processing. Default: `scratch`"
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'entrypoint.js'
   post: 'entrypoint.js'
