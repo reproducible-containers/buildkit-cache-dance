@@ -40,8 +40,8 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/metadata-action@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/metadata-action@v5
         id: meta
         with:
           images: YOUR_IMAGE
@@ -56,17 +56,17 @@ jobs:
           path: var-lib-apt
           key: var-lib-apt-${{ hashFiles('Dockerfile') }}
       - name: inject var-cache-apt into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.2
+        uses: reproducible-containers/buildkit-cache-dance@v2.1.3
         with:
           cache-source: var-cache-apt
           cache-target: /var/cache/apt
       - name: inject var-lib-apt into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.2
+        uses: reproducible-containers/buildkit-cache-dance@v2.1.3
         with:
           cache-source: var-lib-apt
           cache-target: /var/lib/apt
       - name: Build and push
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           cache-from: type=gha
