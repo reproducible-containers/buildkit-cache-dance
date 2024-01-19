@@ -10,6 +10,9 @@ inputs:
   scratch-dir:
     default: scratch
     description: "Where the action is stores some temporary files for its processing. Default: `scratch`"
+  skip-extraction:
+    default: "false"
+    description: "Skip the extraction of the cache from the docker container"
 runs:
   using: 'node20'
   main: 'entrypoint.js'
