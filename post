@@ -5,6 +5,12 @@ dir="$(dirname "$0")"
 read_action_input() {
 	"${dir}/read-action-input" "$1"
 }
+
+if [ "$(read_action_input skip-extraction)" == "true" ]; then
+  echo "skip-extraction is set. Skipping extraction step..." >&2
+  exit 0
+fi
+
 : "Prepare Timestamp for Layer Cache Busting"
 date --iso=ns | tee "$(read_action_input scratch-dir)"/buildstamp
 : "Prepare Dancefile to Access Caches"

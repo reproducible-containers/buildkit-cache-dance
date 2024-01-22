@@ -15,11 +15,13 @@ jobs:
         with:
           images: test
       - name: Cache var-cache-apt
+        id: cache-var-cache-apt
         uses: actions/cache@v3
         with:
           path: var-cache-apt
           key: var-cache-apt-${{ hashFiles('.github/workflows/test/Dockerfile') }}
       - name: Cache var-lib-apt
+        id: cache-var-lib-apt
         uses: actions/cache@v3
         with:
           path: var-lib-apt
@@ -34,6 +36,7 @@ jobs:
         with:
           cache-source: var-lib-apt
           cache-target: /var/lib/apt
+          skip-extraction: ${{ steps.cache-var-lib-apt.outputs.cache-hit }}
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
