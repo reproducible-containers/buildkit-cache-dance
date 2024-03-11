@@ -14,10 +14,14 @@ fi
 : "Prepare Timestamp for Layer Cache Busting"
 date --iso=ns | tee "$(read_action_input scratch-dir)"/buildstamp
 : "Prepare Dancefile to Access Caches"
+
+cache_mount_id="$(read_action_input cache-id)"
+cache_mount_id_string=$(test -n "$cache_mount_id" && echo "id=${cache_mount_id}," || echo '')
+
 cat >"$(read_action_input scratch-dir)"/Dancefile.extract <<EOF
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,target="$(read_action_input cache-target)" \
+RUN --mount=type=cache,id=${cache_mount_id_string}target="$(read_action_input cache-target)" \
     mkdir -p /var/dance-cache/ \
     && cp -p -R "$(read_action_input cache-target)"/. /var/dance-cache/ || true
 EOF

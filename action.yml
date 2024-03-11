@@ -7,6 +7,9 @@ inputs:
   cache-target:
     default: /root/.cache/go-build
     description: "Where the cache is stored in the docker container. Default: `/root/.cache/go-build`"
+  cache-id:
+    default: ''
+    description: "The id of the cache mount. Default: '' (No id)"
   scratch-dir:
     default: scratch
     description: "Where the action is stores some temporary files for its processing. Default: `scratch`"

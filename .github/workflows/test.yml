@@ -36,6 +36,7 @@ jobs:
         with:
           cache-source: var-lib-apt
           cache-target: /var/lib/apt
+          cache-id: cache-var-lib-apt
           skip-extraction: ${{ steps.cache-var-lib-apt.outputs.cache-hit }}
       - name: Build and push
         uses: docker/build-push-action@v5
