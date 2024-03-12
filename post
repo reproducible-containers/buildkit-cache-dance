@@ -18,10 +18,16 @@ date --iso=ns | tee "$(read_action_input scratch-dir)"/buildstamp
 cache_mount_id="$(read_action_input cache-id)"
 cache_mount_id_string=$(test -n "$cache_mount_id" && echo "id=${cache_mount_id}," || echo '')
 
+cache_mount_mode="$(read_action_input cache-mode)"
+cache_mount_mode_string=$(test -n "$cache_mount_mode" && echo "mode=${cache_mount_mode}," || echo '')
+
+cache_mount_sharing="$(read_action_input cache-sharing)"
+cache_mount_sharing_string=$(test -n "$cache_mount_sharing" && echo "sharing=${cache_mount_sharing}," || echo '')
+
 cat >"$(read_action_input scratch-dir)"/Dancefile.extract <<EOF
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,id=${cache_mount_id_string}target="$(read_action_input cache-target)" \
+RUN --mount=type=cache,id=${cache_mount_id_string}${cache_mount_mode_string}${cache_mount_sharing_string}target="$(read_action_input cache-target)" \
     mkdir -p /var/dance-cache/ \
     && cp -p -R "$(read_action_input cache-target)"/. /var/dance-cache/ || true
 EOF
