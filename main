@@ -30,5 +30,7 @@ EOF
 cat "$(read_action_input scratch-dir)"/Dancefile.inject
 : "Inject Data into Docker Cache"
 docker buildx build -f "$(read_action_input scratch-dir)"/Dancefile.inject --tag dance:inject "$(read_action_input cache-source)"
+: "Debug Directories"
+sudo ls -laR "$(read_action_input cache-source)"
 : "Clean Directories"
 sudo rm -rf "$(read_action_input cache-source)"
