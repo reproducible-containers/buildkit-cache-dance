@@ -16,6 +16,9 @@ inputs:
   cache-sharing:
     default: ''
     description: "The sharing option of the cache mount. Default: '' (No sharing option added)"
+  builder:
+    default: ''
+    description: "The sharing option of the cache mount. Default: '' (Use the current builder)"
   scratch-dir:
     default: scratch
     description: "Where the action is stores some temporary files for its processing. Default: `scratch`"

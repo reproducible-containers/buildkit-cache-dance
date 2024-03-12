@@ -33,6 +33,12 @@ RUN --mount=type=cache,id=${cache_mount_id_string}${cache_mount_mode_string}${ca
 EOF
 cat "$(read_action_input scratch-dir)"/Dancefile.extract
 : "Extract Data into Docker Image"
+builder=$(read_action_input builder)
+
+if [[ -n "$builder" ]]; then
+  docker buildx use $builder
+fi
+
 docker buildx build -f "$(read_action_input scratch-dir)"/Dancefile.extract --tag dance:extract --load "$(read_action_input scratch-dir)"
 : "Create Extraction Image"
 docker rm -f cache-container && docker create -ti --name cache-container dance:extract

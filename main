@@ -29,6 +29,13 @@ RUN --mount=type=cache,${cache_mount_id_string}${cache_mount_mode_string}${cache
 EOF
 cat "$(read_action_input scratch-dir)"/Dancefile.inject
 : "Inject Data into Docker Cache"
+
+builder=$(read_action_input builder)
+
+if [[ -n "$builder" ]]; then
+  docker buildx use $builder
+fi
+
 docker buildx build -f "$(read_action_input scratch-dir)"/Dancefile.inject --tag dance:inject "$(read_action_input cache-source)"
 : "Debug Directories"
 sudo ls -laR "$(read_action_input cache-source)"
