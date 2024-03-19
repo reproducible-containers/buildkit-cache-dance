@@ -14,15 +14,31 @@ fi
 : "Prepare Timestamp for Layer Cache Busting"
 date --iso=ns | tee "$(read_action_input scratch-dir)"/buildstamp
 : "Prepare Dancefile to Access Caches"
+
+cache_mount_id="$(read_action_input cache-id)"
+cache_mount_id_string=$(test -n "$cache_mount_id" && echo "id=${cache_mount_id}," || echo '')
+
+cache_mount_mode="$(read_action_input cache-mode)"
+cache_mount_mode_string=$(test -n "$cache_mount_mode" && echo "mode=${cache_mount_mode}," || echo '')
+
+cache_mount_sharing="$(read_action_input cache-sharing)"
+cache_mount_sharing_string=$(test -n "$cache_mount_sharing" && echo "sharing=${cache_mount_sharing}," || echo '')
+
 cat >"$(read_action_input scratch-dir)"/Dancefile.extract <<EOF
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,target="$(read_action_input cache-target)" \
+RUN --mount=type=cache,${cache_mount_id_string}${cache_mount_mode_string}${cache_mount_sharing_string}target="$(read_action_input cache-target)" \
     mkdir -p /var/dance-cache/ \
     && cp -p -R "$(read_action_input cache-target)"/. /var/dance-cache/ || true
 EOF
 cat "$(read_action_input scratch-dir)"/Dancefile.extract
 : "Extract Data into Docker Image"
+builder=$(read_action_input builder)
+
+if [[ -n "$builder" ]]; then
+  docker buildx use $builder
+fi
+
 docker buildx build -f "$(read_action_input scratch-dir)"/Dancefile.extract --tag dance:extract --load "$(read_action_input scratch-dir)"
 : "Create Extraction Image"
 docker rm -f cache-container && docker create -ti --name cache-container dance:extract
@@ -31,3 +47,5 @@ docker cp -L cache-container:/var/dance-cache - | tar -H posix -x -C "$(read_act
 : "Move Cache into Its Place"
 sudo rm -rf "$(read_action_input cache-source)"
 mv "$(read_action_input scratch-dir)"/dance-cache "$(read_action_input cache-source)"
+: "Debug Directories"
+sudo ls -laR "$(read_action_input cache-source)"
