@@ -45,30 +45,21 @@ jobs:
         id: meta
         with:
           images: YOUR_IMAGE
+
       - name: Cache var-cache-apt
         id: cache-var-cache-apt
         uses: actions/cache@v3
         with:
           path: var-cache-apt
           key: var-cache-apt-${{ hashFiles('Dockerfile') }}
-      - name: Cache var-lib-apt
-        id: cache-var-lib-apt
-        uses: actions/cache@v3
-        with:
-          path: var-lib-apt
-          key: var-lib-apt-${{ hashFiles('Dockerfile') }}
+
       - name: inject var-cache-apt into docker
         uses: reproducible-containers/buildkit-cache-dance@v2.1.4
         with:
           cache-source: var-cache-apt
           cache-target: /var/cache/apt
           skip-extraction: ${{ steps.cache-var-cache-apt.outputs.cache-hit }}
-      - name: inject var-lib-apt into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.4
-        with:
-          cache-source: var-lib-apt
-          cache-target: /var/lib/apt
-          skip-extraction: ${{ steps.cache-var-lib-apt.outputs.cache-hit }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
