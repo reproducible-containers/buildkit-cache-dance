@@ -1,0 +1,39 @@
+{
+  "name": "buildkit-cache-dance",
+  "version": "3.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "source": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "parcel build",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "buildkit",
+    "cache",
+    "docker",
+    "github",
+    "actions",
+    "workflow"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "parcel": "^2.12.0",
+    "typescript": "^5.4.3"
+  },
+  "dependencies": {
+    "mri": "^1.2.0",
+    "spawn-please": "^3.0.0"
+  },
+  "targets": {
+    "main": {
+      "includeNodeModules": true
+    }
+  }
+}

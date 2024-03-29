@@ -4,6 +4,7 @@
 /* ================================================================================================================== *
  * Authors:                                                                                                           *
  *   Unai Martinez-Corral                                                                                             *
+ *   Amin Yahyaabadi                                                                                                  *
  *                                                                                                                    *
  * ================================================================================================================== *
  * Copyright 2021-2022 Unai Martinez-Corral <unai.martinezcorral@ehu.eus>                                             *
@@ -28,22 +29,28 @@
  * * https://github.com/docker/login-action/issues/72                                                                 *
  * * https://github.com/actions/runner/issues/1478                                                                    *
  * ================================================================================================================== */
-const { spawn } = require("child_process");
-const { appendFileSync } = require("fs");
-const { EOL } = require("os");
+import { appendFile } from "fs/promises";
+import { EOL } from "os";
+import { injectCaches } from "./inject-cache.js";
+import { extractCaches } from "./extract-cache.js";
+import { parseOpts } from "./opts.js";
 
-function run(cmd) {
-  const subprocess = spawn(cmd, { stdio: "inherit", shell: false });
-  subprocess.on("exit", (exitCode) => {
-    process.exitCode = exitCode;
-  });
+async function main(args: string[]) {
+  const opts = parseOpts(args);
+
+  const is_post_step = process.env[`STATE_POST`] !== undefined;
+
+  if (is_post_step) {
+    // Run the post step
+    extractCaches(opts);
+  } else {
+    // Otherwise, this is the main step
+    if (process.env.GITHUB_STATE === undefined) {
+      throw new Error("GITHUB_STATE is not defined");
+    }
+    await appendFile(process.env.GITHUB_STATE, `POST=true${EOL}`);
+    await injectCaches(opts);
+  }
 }
 
-const key = "POST"
-
-if ( process.env[`STATE_${key}`] !== undefined ) { // Are we in the 'post' step?
-  run(__dirname+"/post");
-} else { // Otherwise, this is the main step
-  appendFileSync(process.env.GITHUB_STATE, `${key}=true${EOL}`);
-  run(__dirname+"/main");
-}
+await main(process.argv);

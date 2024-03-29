@@ -32,11 +32,11 @@ Action:
 ```yaml
 ---
 name: Build
-on: push
+on:
+  push:
 
 jobs:
-  build:
-    name: Build
+  Build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -44,31 +44,27 @@ jobs:
       - uses: docker/metadata-action@v5
         id: meta
         with:
-          images: YOUR_IMAGE
-      - name: Cache var-cache-apt
-        id: cache-var-cache-apt
+          images: Build
+
+      - name: Cache
         uses: actions/cache@v3
+        id: cache
         with:
-          path: var-cache-apt
-          key: var-cache-apt-${{ hashFiles('Dockerfile') }}
-      - name: Cache var-lib-apt
-        id: cache-var-lib-apt
-        uses: actions/cache@v3
+          path: |
+            var-cache-apt
+            var-lib-apt
+          key: cache-${{ hashFiles('.github/workflows/test/Dockerfile') }}
+
+      - name: inject cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.0.0
         with:
-          path: var-lib-apt
-          key: var-lib-apt-${{ hashFiles('Dockerfile') }}
-      - name: inject var-cache-apt into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.4
-        with:
-          cache-source: var-cache-apt
-          cache-target: /var/cache/apt
-          skip-extraction: ${{ steps.cache-var-cache-apt.outputs.cache-hit }}
-      - name: inject var-lib-apt into docker
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.4
-        with:
-          cache-source: var-lib-apt
-          cache-target: /var/lib/apt
-          skip-extraction: ${{ steps.cache-var-lib-apt.outputs.cache-hit }}
+          cache-map: |
+            {
+              "var-cache-apt": "/var/cache/apt",
+              "var-lib-apt": "/var/lib/apt"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -79,6 +75,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
 ```
 
 Real-world examples:
