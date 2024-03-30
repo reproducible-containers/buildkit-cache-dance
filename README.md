@@ -1,7 +1,8 @@
-# The BuildKit Cache Dance: save `RUN --mount=type=cache` caches on GitHub Actions
+# The BuildKit Cache Dance
+Save `RUN --mount=type=cache` caches on GitHub Actions or other CI platforms
 
 The BuildKit Cache Dance allows saving [`RUN --mount=type=cache`](https://docs.docker.com/build/guide/mounts/#add-a-cache-mount)
-caches on GitHub Actions.
+caches on GitHub Actions or other CI platforms by extracting the cache from the previous build and injecting it into the current build.
 
 Use cases:
 - apt-get (`/var/cache/apt`, `/var/lib/apt`)
@@ -14,7 +15,9 @@ This [`reproducible-containers/buildkit-cache-dance`](https://github.com/reprodu
 This action be used for "non-reproducible" containers too.
 
 ## Examples
-### apt-get
+
+### apt-get GitHub Actions
+
 Dockerfile:
 ```dockerfile
 FROM ubuntu:22.04
@@ -82,6 +85,40 @@ Real-world examples:
 - <https://github.com/rootless-containers/slirp4netns/blob/v1.2.2/.github/workflows/release.yaml#L18-L36>
 - <https://github.com/containers/fuse-overlayfs/blob/40e0f3c/.github/workflows/release.yaml#L17-L36>
 
+## CLI Usage
+
+In other CI systems, you can run the script directly via `node`:
+
+```shell
+curl -LJO https://github.com/reproducible-containers/buildkit-cache-dance/archive/refs/tags/v3.0.0.tar.gz
+tar xvf buildkit-cache-dance-3.0.0.tar.gz
+```
+During injection:
+
+```shell
+node  ./buildkit-cache-dance-3.0.0/dist/index.js --cache-map '{"var-cache-apt": "/var/cache/apt", "var-lib-apt": "/var/lib/apt"}'
+```
+
+After build during extraction:
+
+```shell
+node  ./buildkit-cache-dance-3.0.0/dist/index.js --extract --cache-map '{"var-cache-apt": "/var/cache/apt", "var-lib-apt": "/var/lib/apt"}'
+```
+
+Here are the available options:
+
+```
+build-cache-dance [options]
+Save 'RUN --mount=type=cache' caches on GitHub Actions or other CI platforms
+
+Options:
+  --extract      Extract the cache from the docker container (extract step). Otherwise, inject the cache (main step)
+  --cache-map    The map of actions source to container destination paths for the cache paths
+  --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
+  --skip-extraction  Skip the extraction of the cache from the docker container
+  --help         Show this help
+```
+
 ## Releases
 ### v1
 v1 follows the original design of [`overmindtech/buildkit-cache-dance`](https://github.com/overmindtech/buildkit-cache-dance/tree/306d31a77191f643c0c4a95083f36c6ddccb4a16).
@@ -94,6 +131,12 @@ See the [`releases/v1`](https://github.com/reproducible-containers/buildkit-cach
 
 ### v2
 v2 is composed of the single `reproducible-containers/buildkit-cache-dance` action.
+
+### v3
+
+Rewrote the action in TypeScript and adds support for `cache-map` that gets a string of files that need to be injected as a JSON string. This makes it possible to inject multiple directories in one call and simplifies the usage.
+
+This release also makes it possible to run the script outside GitHub Actions in other CI platforms or locally using command line arguments.
 
 ## Acknowledgement
 - Thanks to [Alexander Pravdin](https://github.com/speller) for the basic idea in [this comment](https://github.com/moby/buildkit/issues/1512).

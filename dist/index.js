@@ -103,36 +103,7 @@ function $3cdc9f651a760b03$var$checkMode(stat, options) {
 
 });
 
-// Forked from https://github.com/pyTooling/Actions/blob/v0.4.6/with-post-step/main.js
-// The following copyright header is from the upstream.
-/* ================================================================================================================== *
- * Authors:                                                                                                           *
- *   Unai Martinez-Corral                                                                                             *
- *   Amin Yahyaabadi                                                                                                  *
- *                                                                                                                    *
- * ================================================================================================================== *
- * Copyright 2021-2022 Unai Martinez-Corral <unai.martinezcorral@ehu.eus>                                             *
- * Copyright 2022 Unai Martinez-Corral <umartinezcorral@antmicro.com>                                                 *
- *                                                                                                                    *
- * Licensed under the Apache License, Version 2.0 (the "License");                                                    *
- * you may not use this file except in compliance with the License.                                                   *
- * You may obtain a copy of the License at                                                                            *
- *                                                                                                                    *
- *     http://www.apache.org/licenses/LICENSE-2.0                                                                     *
- *                                                                                                                    *
- * Unless required by applicable law or agreed to in writing, software                                                *
- * distributed under the License is distributed on an "AS IS" BASIS,                                                  *
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.                                           *
- * See the License for the specific language governing permissions and                                                *
- * limitations under the License.                                                                                     *
- *                                                                                                                    *
- * SPDX-License-Identifier: Apache-2.0                                                                                *
- * ================================================================================================================== *
- *                                                                                                                    *
- * Context:                                                                                                           *
- * * https://github.com/docker/login-action/issues/72                                                                 *
- * * https://github.com/actions/runner/issues/1478                                                                    *
- * ================================================================================================================== */ 
+
 
 
 
@@ -228,16 +199,36 @@ function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
         default: {
             "cache-map": $76d06fcdc9bff1f5$var$getInput("cache-map"),
             "scratch-dir": $76d06fcdc9bff1f5$var$getInput("scratch-dir"),
-            "skip-extraction": $76d06fcdc9bff1f5$var$getInput("skip-extraction") === "true"
+            "skip-extraction": $76d06fcdc9bff1f5$var$getInput("skip-extraction") === "true",
+            "extract": process.env[`STATE_POST`] !== undefined
         },
         string: [
             "cache-map",
             "scratch-dir"
         ],
         boolean: [
-            "skip-extraction"
-        ]
+            "skip-extraction",
+            "help",
+            "extract"
+        ],
+        alias: {
+            "help": [
+                "h"
+            ]
+        }
     });
+}
+function $76d06fcdc9bff1f5$export$34512e3b2db52a4e() {
+    console.log(`build-cache-dance [options]
+Save 'RUN --mount=type=cache' caches on GitHub Actions or other CI platforms
+
+Options:
+  --extract      Extract the cache from the docker container (extract step). Otherwise, inject the cache (main step)
+  --cache-map    The map of actions source to container destination paths for the cache paths
+  --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
+  --skip-extraction  Skip the extraction of the cache from the docker container
+  --help         Show this help
+`);
 }
 /**
  * Get the action input value from the environment (INPUT_NAME)
@@ -844,13 +835,12 @@ async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
 
 async function $bec5d2ddaaf4a876$var$main(args) {
     const opts = (0, $76d06fcdc9bff1f5$export$77714ac6976d0316)(args);
-    const is_post_step = process.env[`STATE_POST`] !== undefined;
-    if (is_post_step) // Run the post step
+    if (opts.help) return (0, $76d06fcdc9bff1f5$export$34512e3b2db52a4e)();
+    if (opts.extract) // Run the post step
     (0, $8d40300f3635b768$export$bd3cfa0c41fc7012)(opts);
     else {
         // Otherwise, this is the main step
-        if (process.env.GITHUB_STATE === undefined) throw new Error("GITHUB_STATE is not defined");
-        await (0, $evV72$appendFile)(process.env.GITHUB_STATE, `POST=true${(0, $evV72$EOL)}`);
+        if (process.env.GITHUB_STATE !== undefined) await (0, $evV72$appendFile)(process.env.GITHUB_STATE, `POST=true${(0, $evV72$EOL)}`);
         await (0, $bd1d73aff0732146$export$38c65e9f06d3d433)(opts);
     }
 }
