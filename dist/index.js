@@ -1179,10 +1179,16 @@ $92de28abfb9027ac$exports._enoent = $1ef36613317ba37d$exports;
 $03c48d50d9d7039f$exports = $03c48d50d9d7039f$var$spawnPlease;
 
 
-function $4c028fad90f63861$export$889ea624f2cb2c57(command, args) {
-    return (0, (/*@__PURE__*/$parcel$interopDefault($03c48d50d9d7039f$exports)))(command, args, {}, {
-        stdout: "inherit"
-    });
+async function $4c028fad90f63861$export$889ea624f2cb2c57(command, args) {
+    try {
+        return await (0, (/*@__PURE__*/$parcel$interopDefault($03c48d50d9d7039f$exports)))(command, args, {}, {
+            stdout: "inherit",
+            stderr: "inherit"
+        });
+    } catch (error) {
+        console.error(`Error running command: ${command} ${args.join(" ")}`);
+        throw error;
+    }
 }
 
 
