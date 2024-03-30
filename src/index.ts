@@ -23,4 +23,12 @@ async function main(args: string[]) {
   }
 }
 
-await main(process.argv);
+try {
+  await main(process.argv);
+} catch (err) {
+  console.error(err);
+  if (err instanceof Error) {
+    console.error(err.stack);
+  }
+  process.exit(1);
+}

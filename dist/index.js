@@ -1340,7 +1340,13 @@ async function $bec5d2ddaaf4a876$var$main(args) {
         await (0, $bd1d73aff0732146$export$38c65e9f06d3d433)(opts);
     }
 }
-await $bec5d2ddaaf4a876$var$main(process.argv);
+try {
+    await $bec5d2ddaaf4a876$var$main(process.argv);
+} catch (err) {
+    console.error(err);
+    if (err instanceof Error) console.error(err.stack);
+    process.exit(1);
+}
 
 
 //# sourceMappingURL=index.js.map
