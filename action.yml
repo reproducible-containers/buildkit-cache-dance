@@ -4,6 +4,12 @@ inputs:
   cache-map:
     required: true
     description: "The map of actions source to container destination paths for the cache paths"
+  cache-source:
+    deprecationMessage: "Use `cache-map` instead"
+    description: "Where the cache is stored in the calling workspace. Default: `cache`"
+  cache-target:
+    deprecationMessage: "Use `cache-map` instead"
+    description: "Where the cache is stored in the docker container. Default: `/root/.cache/go-build`"
   scratch-dir:
     default: scratch
     description: "Where the action is stores some temporary files for its processing. Default: `scratch`"

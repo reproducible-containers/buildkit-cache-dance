@@ -1,7 +1,7 @@
-import {stat as $evV72$stat, statSync as $evV72$statSync, openSync as $evV72$openSync, readSync as $evV72$readSync, closeSync as $evV72$closeSync} from "fs";
-import {appendFile as $evV72$appendFile, rm as $evV72$rm, mkdir as $evV72$mkdir, writeFile as $evV72$writeFile, rename as $evV72$rename} from "fs/promises";
-import {EOL as $evV72$EOL} from "os";
-import {join as $evV72$join, normalize as $evV72$normalize, delimiter as $evV72$delimiter, resolve as $evV72$resolve} from "path";
+import * as $evV72$fs from "fs";
+import $evV72$fspromises from "fs/promises";
+import $evV72$os, * as $evV72$os1 from "os";
+import $evV72$path, * as $evV72$path1 from "path";
 import {spawn as $evV72$spawn, spawnSync as $evV72$spawnSync} from "child_process";
 
 
@@ -194,17 +194,506 @@ function $ec42a3295e12ea98$export$2e2bcd8739ae039(args, opts) {
 }
 
 
+var $bbb9dac42384d004$exports = {};
+"use strict";
+var $bbb9dac42384d004$var$__createBinding = $bbb9dac42384d004$exports && $bbb9dac42384d004$exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, {
+        enumerable: true,
+        get: function() {
+            return m[k];
+        }
+    });
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var $bbb9dac42384d004$var$__setModuleDefault = $bbb9dac42384d004$exports && $bbb9dac42384d004$exports.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var $bbb9dac42384d004$var$__importStar = $bbb9dac42384d004$exports && $bbb9dac42384d004$exports.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.hasOwnProperty.call(mod, k)) $bbb9dac42384d004$var$__createBinding(result, mod, k);
+    }
+    $bbb9dac42384d004$var$__setModuleDefault(result, mod);
+    return result;
+};
+var $bbb9dac42384d004$var$__awaiter = $bbb9dac42384d004$exports && $bbb9dac42384d004$exports.__awaiter || function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+        return value instanceof P ? value : new P(function(resolve) {
+            resolve(value);
+        });
+    }
+    return new (P || (P = Promise))(function(resolve, reject) {
+        function fulfilled(value) {
+            try {
+                step(generator.next(value));
+            } catch (e) {
+                reject(e);
+            }
+        }
+        function rejected(value) {
+            try {
+                step(generator["throw"](value));
+            } catch (e) {
+                reject(e);
+            }
+        }
+        function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+        }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty($bbb9dac42384d004$exports, "__esModule", {
+    value: true
+});
+$bbb9dac42384d004$exports.getState = $bbb9dac42384d004$exports.saveState = $bbb9dac42384d004$exports.group = $bbb9dac42384d004$exports.endGroup = $bbb9dac42384d004$exports.startGroup = $bbb9dac42384d004$exports.info = $bbb9dac42384d004$exports.notice = $bbb9dac42384d004$exports.warning = $bbb9dac42384d004$exports.error = $bbb9dac42384d004$exports.debug = $bbb9dac42384d004$exports.isDebug = $bbb9dac42384d004$exports.setFailed = $bbb9dac42384d004$exports.setCommandEcho = $bbb9dac42384d004$exports.setOutput = $bbb9dac42384d004$exports.getBooleanInput = $bbb9dac42384d004$exports.getMultilineInput = $bbb9dac42384d004$exports.getInput = $bbb9dac42384d004$exports.addPath = $bbb9dac42384d004$exports.setSecret = $bbb9dac42384d004$exports.exportVariable = $bbb9dac42384d004$exports.ExitCode = void 0;
+var $6aa988ea1669fe85$exports = {};
+"use strict";
+var $6aa988ea1669fe85$var$__createBinding = $6aa988ea1669fe85$exports && $6aa988ea1669fe85$exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, {
+        enumerable: true,
+        get: function() {
+            return m[k];
+        }
+    });
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var $6aa988ea1669fe85$var$__setModuleDefault = $6aa988ea1669fe85$exports && $6aa988ea1669fe85$exports.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var $6aa988ea1669fe85$var$__importStar = $6aa988ea1669fe85$exports && $6aa988ea1669fe85$exports.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.hasOwnProperty.call(mod, k)) $6aa988ea1669fe85$var$__createBinding(result, mod, k);
+    }
+    $6aa988ea1669fe85$var$__setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty($6aa988ea1669fe85$exports, "__esModule", {
+    value: true
+});
+$6aa988ea1669fe85$exports.issue = $6aa988ea1669fe85$exports.issueCommand = void 0;
+
+const $6aa988ea1669fe85$var$os = $6aa988ea1669fe85$var$__importStar($evV72$os1);
+var $1f87556d0f647bcd$exports = {};
+"use strict";
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */ Object.defineProperty($1f87556d0f647bcd$exports, "__esModule", {
+    value: true
+});
+$1f87556d0f647bcd$exports.toCommandProperties = $1f87556d0f647bcd$exports.toCommandValue = void 0;
+/**
+ * Sanitizes an input into a string so it can be passed into issueCommand safely
+ * @param input input to sanitize into a string
+ */ function $1f87556d0f647bcd$var$toCommandValue(input) {
+    if (input === null || input === undefined) return "";
+    else if (typeof input === "string" || input instanceof String) return input;
+    return JSON.stringify(input);
+}
+$1f87556d0f647bcd$exports.toCommandValue = $1f87556d0f647bcd$var$toCommandValue;
+/**
+ *
+ * @param annotationProperties
+ * @returns The command properties to send with the actual annotation command
+ * See IssueCommandProperties: https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs#L646
+ */ function $1f87556d0f647bcd$var$toCommandProperties(annotationProperties) {
+    if (!Object.keys(annotationProperties).length) return {};
+    return {
+        title: annotationProperties.title,
+        line: annotationProperties.startLine,
+        endLine: annotationProperties.endLine,
+        col: annotationProperties.startColumn,
+        endColumn: annotationProperties.endColumn
+    };
+}
+$1f87556d0f647bcd$exports.toCommandProperties = $1f87556d0f647bcd$var$toCommandProperties;
+
+
+/**
+ * Commands
+ *
+ * Command Format:
+ *   ::name key=value,key=value::message
+ *
+ * Examples:
+ *   ::warning::This is the message
+ *   ::set-env name=MY_VAR::some value
+ */ function $6aa988ea1669fe85$var$issueCommand(command, properties, message) {
+    const cmd = new $6aa988ea1669fe85$var$Command(command, properties, message);
+    process.stdout.write(cmd.toString() + $6aa988ea1669fe85$var$os.EOL);
+}
+$6aa988ea1669fe85$exports.issueCommand = $6aa988ea1669fe85$var$issueCommand;
+function $6aa988ea1669fe85$var$issue(name, message = "") {
+    $6aa988ea1669fe85$var$issueCommand(name, {}, message);
+}
+$6aa988ea1669fe85$exports.issue = $6aa988ea1669fe85$var$issue;
+const $6aa988ea1669fe85$var$CMD_STRING = "::";
+class $6aa988ea1669fe85$var$Command {
+    constructor(command, properties, message){
+        if (!command) command = "missing.command";
+        this.command = command;
+        this.properties = properties;
+        this.message = message;
+    }
+    toString() {
+        let cmdStr = $6aa988ea1669fe85$var$CMD_STRING + this.command;
+        if (this.properties && Object.keys(this.properties).length > 0) {
+            cmdStr += " ";
+            let first = true;
+            for(const key in this.properties)if (this.properties.hasOwnProperty(key)) {
+                const val = this.properties[key];
+                if (val) {
+                    if (first) first = false;
+                    else cmdStr += ",";
+                    cmdStr += `${key}=${$6aa988ea1669fe85$var$escapeProperty(val)}`;
+                }
+            }
+        }
+        cmdStr += `${$6aa988ea1669fe85$var$CMD_STRING}${$6aa988ea1669fe85$var$escapeData(this.message)}`;
+        return cmdStr;
+    }
+}
+function $6aa988ea1669fe85$var$escapeData(s) {
+    return $1f87556d0f647bcd$exports.toCommandValue(s).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A");
+}
+function $6aa988ea1669fe85$var$escapeProperty(s) {
+    return $1f87556d0f647bcd$exports.toCommandValue(s).replace(/%/g, "%25").replace(/\r/g, "%0D").replace(/\n/g, "%0A").replace(/:/g, "%3A").replace(/,/g, "%2C");
+}
+
+
+var $71d1c579b85cee7b$exports = {};
+"use strict";
+// For internal use, subject to change.
+var $71d1c579b85cee7b$var$__createBinding = $71d1c579b85cee7b$exports && $71d1c579b85cee7b$exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, {
+        enumerable: true,
+        get: function() {
+            return m[k];
+        }
+    });
+} : function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+var $71d1c579b85cee7b$var$__setModuleDefault = $71d1c579b85cee7b$exports && $71d1c579b85cee7b$exports.__setModuleDefault || (Object.create ? function(o, v) {
+    Object.defineProperty(o, "default", {
+        enumerable: true,
+        value: v
+    });
+} : function(o, v) {
+    o["default"] = v;
+});
+var $71d1c579b85cee7b$var$__importStar = $71d1c579b85cee7b$exports && $71d1c579b85cee7b$exports.__importStar || function(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) {
+        for(var k in mod)if (k !== "default" && Object.hasOwnProperty.call(mod, k)) $71d1c579b85cee7b$var$__createBinding(result, mod, k);
+    }
+    $71d1c579b85cee7b$var$__setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty($71d1c579b85cee7b$exports, "__esModule", {
+    value: true
+});
+$71d1c579b85cee7b$exports.issueCommand = void 0;
+
+// We use any as a valid input type
+/* eslint-disable @typescript-eslint/no-explicit-any */ const $71d1c579b85cee7b$var$fs = $71d1c579b85cee7b$var$__importStar($evV72$fs);
+
+const $71d1c579b85cee7b$var$os = $71d1c579b85cee7b$var$__importStar($evV72$os1);
+
+function $71d1c579b85cee7b$var$issueCommand(command, message) {
+    const filePath = process.env[`GITHUB_${command}`];
+    if (!filePath) throw new Error(`Unable to find environment variable for file command ${command}`);
+    if (!$71d1c579b85cee7b$var$fs.existsSync(filePath)) throw new Error(`Missing file at path: ${filePath}`);
+    $71d1c579b85cee7b$var$fs.appendFileSync(filePath, `${$1f87556d0f647bcd$exports.toCommandValue(message)}${$71d1c579b85cee7b$var$os.EOL}`, {
+        encoding: "utf8"
+    });
+}
+$71d1c579b85cee7b$exports.issueCommand = $71d1c579b85cee7b$var$issueCommand;
+
+
+
+
+const $bbb9dac42384d004$var$os = $bbb9dac42384d004$var$__importStar($evV72$os1);
+
+const $bbb9dac42384d004$var$path = $bbb9dac42384d004$var$__importStar($evV72$path1);
+/**
+ * The code to exit an action
+ */ var $bbb9dac42384d004$var$ExitCode;
+(function(ExitCode) {
+    /**
+     * A code indicating that the action was successful
+     */ ExitCode[ExitCode["Success"] = 0] = "Success";
+    /**
+     * A code indicating that the action was a failure
+     */ ExitCode[ExitCode["Failure"] = 1] = "Failure";
+})($bbb9dac42384d004$var$ExitCode = $bbb9dac42384d004$exports.ExitCode || ($bbb9dac42384d004$exports.ExitCode = {}));
+//-----------------------------------------------------------------------
+// Variables
+//-----------------------------------------------------------------------
+/**
+ * Sets env variable for this action and future actions in the job
+ * @param name the name of the variable to set
+ * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
+ */ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function $bbb9dac42384d004$var$exportVariable(name, val) {
+    const convertedVal = $1f87556d0f647bcd$exports.toCommandValue(val);
+    process.env[name] = convertedVal;
+    const filePath = process.env["GITHUB_ENV"] || "";
+    if (filePath) {
+        const delimiter = "_GitHubActionsFileCommandDelimeter_";
+        const commandValue = `${name}<<${delimiter}${$bbb9dac42384d004$var$os.EOL}${convertedVal}${$bbb9dac42384d004$var$os.EOL}${delimiter}`;
+        $71d1c579b85cee7b$exports.issueCommand("ENV", commandValue);
+    } else $6aa988ea1669fe85$exports.issueCommand("set-env", {
+        name: name
+    }, convertedVal);
+}
+$bbb9dac42384d004$exports.exportVariable = $bbb9dac42384d004$var$exportVariable;
+/**
+ * Registers a secret which will get masked from logs
+ * @param secret value of the secret
+ */ function $bbb9dac42384d004$var$setSecret(secret) {
+    $6aa988ea1669fe85$exports.issueCommand("add-mask", {}, secret);
+}
+$bbb9dac42384d004$exports.setSecret = $bbb9dac42384d004$var$setSecret;
+/**
+ * Prepends inputPath to the PATH (for this action and future actions)
+ * @param inputPath
+ */ function $bbb9dac42384d004$var$addPath(inputPath) {
+    const filePath = process.env["GITHUB_PATH"] || "";
+    if (filePath) $71d1c579b85cee7b$exports.issueCommand("PATH", inputPath);
+    else $6aa988ea1669fe85$exports.issueCommand("add-path", {}, inputPath);
+    process.env["PATH"] = `${inputPath}${$bbb9dac42384d004$var$path.delimiter}${process.env["PATH"]}`;
+}
+$bbb9dac42384d004$exports.addPath = $bbb9dac42384d004$var$addPath;
+/**
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string
+ */ function $bbb9dac42384d004$var$getInput(name, options) {
+    const val = process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
+    if (options && options.required && !val) throw new Error(`Input required and not supplied: ${name}`);
+    if (options && options.trimWhitespace === false) return val;
+    return val.trim();
+}
+$bbb9dac42384d004$exports.getInput = $bbb9dac42384d004$var$getInput;
+/**
+ * Gets the values of an multiline input.  Each value is also trimmed.
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   string[]
+ *
+ */ function $bbb9dac42384d004$var$getMultilineInput(name, options) {
+    const inputs = $bbb9dac42384d004$var$getInput(name, options).split("\n").filter((x)=>x !== "");
+    return inputs;
+}
+$bbb9dac42384d004$exports.getMultilineInput = $bbb9dac42384d004$var$getMultilineInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */ function $bbb9dac42384d004$var$getBooleanInput(name, options) {
+    const trueValue = [
+        "true",
+        "True",
+        "TRUE"
+    ];
+    const falseValue = [
+        "false",
+        "False",
+        "FALSE"
+    ];
+    const val = $bbb9dac42384d004$var$getInput(name, options);
+    if (trueValue.includes(val)) return true;
+    if (falseValue.includes(val)) return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` + `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+$bbb9dac42384d004$exports.getBooleanInput = $bbb9dac42384d004$var$getBooleanInput;
+/**
+ * Sets the value of an output.
+ *
+ * @param     name     name of the output to set
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function $bbb9dac42384d004$var$setOutput(name, value) {
+    process.stdout.write($bbb9dac42384d004$var$os.EOL);
+    $6aa988ea1669fe85$exports.issueCommand("set-output", {
+        name: name
+    }, value);
+}
+$bbb9dac42384d004$exports.setOutput = $bbb9dac42384d004$var$setOutput;
+/**
+ * Enables or disables the echoing of commands into stdout for the rest of the step.
+ * Echoing is disabled by default if ACTIONS_STEP_DEBUG is not set.
+ *
+ */ function $bbb9dac42384d004$var$setCommandEcho(enabled) {
+    $6aa988ea1669fe85$exports.issue("echo", enabled ? "on" : "off");
+}
+$bbb9dac42384d004$exports.setCommandEcho = $bbb9dac42384d004$var$setCommandEcho;
+//-----------------------------------------------------------------------
+// Results
+//-----------------------------------------------------------------------
+/**
+ * Sets the action status to failed.
+ * When the action exits it will be with an exit code of 1
+ * @param message add error issue message
+ */ function $bbb9dac42384d004$var$setFailed(message) {
+    process.exitCode = $bbb9dac42384d004$var$ExitCode.Failure;
+    $bbb9dac42384d004$var$error(message);
+}
+$bbb9dac42384d004$exports.setFailed = $bbb9dac42384d004$var$setFailed;
+//-----------------------------------------------------------------------
+// Logging Commands
+//-----------------------------------------------------------------------
+/**
+ * Gets whether Actions Step Debug is on or not
+ */ function $bbb9dac42384d004$var$isDebug() {
+    return process.env["RUNNER_DEBUG"] === "1";
+}
+$bbb9dac42384d004$exports.isDebug = $bbb9dac42384d004$var$isDebug;
+/**
+ * Writes debug message to user log
+ * @param message debug message
+ */ function $bbb9dac42384d004$var$debug(message) {
+    $6aa988ea1669fe85$exports.issueCommand("debug", {}, message);
+}
+$bbb9dac42384d004$exports.debug = $bbb9dac42384d004$var$debug;
+/**
+ * Adds an error issue
+ * @param message error issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */ function $bbb9dac42384d004$var$error(message, properties = {}) {
+    $6aa988ea1669fe85$exports.issueCommand("error", $1f87556d0f647bcd$exports.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+$bbb9dac42384d004$exports.error = $bbb9dac42384d004$var$error;
+/**
+ * Adds a warning issue
+ * @param message warning issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */ function $bbb9dac42384d004$var$warning(message, properties = {}) {
+    $6aa988ea1669fe85$exports.issueCommand("warning", $1f87556d0f647bcd$exports.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+$bbb9dac42384d004$exports.warning = $bbb9dac42384d004$var$warning;
+/**
+ * Adds a notice issue
+ * @param message notice issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */ function $bbb9dac42384d004$var$notice(message, properties = {}) {
+    $6aa988ea1669fe85$exports.issueCommand("notice", $1f87556d0f647bcd$exports.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+$bbb9dac42384d004$exports.notice = $bbb9dac42384d004$var$notice;
+/**
+ * Writes info to log with console.log.
+ * @param message info message
+ */ function $bbb9dac42384d004$var$info(message) {
+    process.stdout.write(message + $bbb9dac42384d004$var$os.EOL);
+}
+$bbb9dac42384d004$exports.info = $bbb9dac42384d004$var$info;
+/**
+ * Begin an output group.
+ *
+ * Output until the next `groupEnd` will be foldable in this group
+ *
+ * @param name The name of the output group
+ */ function $bbb9dac42384d004$var$startGroup(name) {
+    $6aa988ea1669fe85$exports.issue("group", name);
+}
+$bbb9dac42384d004$exports.startGroup = $bbb9dac42384d004$var$startGroup;
+/**
+ * End an output group.
+ */ function $bbb9dac42384d004$var$endGroup() {
+    $6aa988ea1669fe85$exports.issue("endgroup");
+}
+$bbb9dac42384d004$exports.endGroup = $bbb9dac42384d004$var$endGroup;
+/**
+ * Wrap an asynchronous function call in a group.
+ *
+ * Returns the same type as the function itself.
+ *
+ * @param name The name of the group
+ * @param fn The function to wrap in the group
+ */ function $bbb9dac42384d004$var$group(name, fn) {
+    return $bbb9dac42384d004$var$__awaiter(this, void 0, void 0, function*() {
+        $bbb9dac42384d004$var$startGroup(name);
+        let result;
+        try {
+            result = yield fn();
+        } finally{
+            $bbb9dac42384d004$var$endGroup();
+        }
+        return result;
+    });
+}
+$bbb9dac42384d004$exports.group = $bbb9dac42384d004$var$group;
+//-----------------------------------------------------------------------
+// Wrapper action state
+//-----------------------------------------------------------------------
+/**
+ * Saves state for current action, the state can only be retrieved by this action's post job execution.
+ *
+ * @param     name     name of the state to store
+ * @param     value    value to store. Non-string values will be converted to a string via JSON.stringify
+ */ // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function $bbb9dac42384d004$var$saveState(name, value) {
+    $6aa988ea1669fe85$exports.issueCommand("save-state", {
+        name: name
+    }, value);
+}
+$bbb9dac42384d004$exports.saveState = $bbb9dac42384d004$var$saveState;
+/**
+ * Gets the value of an state set by this action's main execution.
+ *
+ * @param     name     name of the state to get
+ * @returns   string
+ */ function $bbb9dac42384d004$var$getState(name) {
+    return process.env[`STATE_${name}`] || "";
+}
+$bbb9dac42384d004$exports.getState = $bbb9dac42384d004$var$getState;
+
+
 function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
-    return (0, $ec42a3295e12ea98$export$2e2bcd8739ae039)(args, {
+    const opts = (0, $ec42a3295e12ea98$export$2e2bcd8739ae039)(args, {
         default: {
-            "cache-map": $76d06fcdc9bff1f5$var$getInput("cache-map"),
-            "scratch-dir": $76d06fcdc9bff1f5$var$getInput("scratch-dir"),
-            "skip-extraction": $76d06fcdc9bff1f5$var$getInput("skip-extraction") === "true",
+            "cache-map": (0, $bbb9dac42384d004$exports.getInput)("cache-map"),
+            "scratch-dir": (0, $bbb9dac42384d004$exports.getInput)("scratch-dir"),
+            "skip-extraction": (0, $bbb9dac42384d004$exports.getInput)("skip-extraction") === "true",
             "extract": process.env[`STATE_POST`] !== undefined
         },
         string: [
             "cache-map",
-            "scratch-dir"
+            "scratch-dir",
+            "cache-source",
+            "cache-target"
         ],
         boolean: [
             "skip-extraction",
@@ -217,6 +706,13 @@ function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
             ]
         }
     });
+    if (opts["cache-source"] && opts["cache-target"]) {
+        (0, $bbb9dac42384d004$exports.warning)("The `cache-source` and `cache-target` options are deprecated. Use `cache-map` instead.");
+        opts["cache-map"] = JSON.stringify({
+            [opts["cache-source"]]: opts["cache-target"]
+        });
+    }
+    return opts;
 }
 function $76d06fcdc9bff1f5$export$34512e3b2db52a4e() {
     console.log(`build-cache-dance [options]
@@ -229,12 +725,6 @@ Options:
   --skip-extraction  Skip the extraction of the cache from the docker container
   --help         Show this help
 `);
-}
-/**
- * Get the action input value from the environment (INPUT_NAME)
- */ function $76d06fcdc9bff1f5$var$getInput(name) {
-    const val = process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
-    return val.trim();
 }
 function $76d06fcdc9bff1f5$export$8550a4d7282a21d0(opts) {
     try {
@@ -698,22 +1188,22 @@ function $4c028fad90f63861$export$889ea624f2cb2c57(command, args) {
 
 async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scratchDir) {
     // Clean Scratch Directory
-    await $evV72$rm(scratchDir, {
+    await (0, $evV72$fspromises).rm(scratchDir, {
         recursive: true,
         force: true
     });
-    await $evV72$mkdir(scratchDir, {
+    await (0, $evV72$fspromises).mkdir(scratchDir, {
         recursive: true
     });
     // Prepare Cache Source Directory
-    await $evV72$mkdir(cacheSource, {
+    await (0, $evV72$fspromises).mkdir(cacheSource, {
         recursive: true
     });
     // Prepare Timestamp for Layer Cache Busting
     const { stdout: date } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("date", [
         "--iso=ns"
     ]);
-    await $evV72$writeFile($evV72$join(cacheSource, "buildstamp"), date);
+    await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(cacheSource, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
 FROM busybox:1
@@ -722,20 +1212,20 @@ RUN --mount=type=cache,target=${cacheTarget} \
     --mount=type=bind,source=.,target=/var/dance-cache \
     cp -p -R /var/dance-cache/. ${cacheTarget} || true
 `;
-    await $evV72$writeFile($evV72$join(scratchDir, "Dancefile.inject"), dancefileContent);
+    await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.inject"), dancefileContent);
     console.log(dancefileContent);
     // Inject Data into Docker Cache
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
         "-f",
-        $evV72$join(scratchDir, "Dancefile.inject"),
+        (0, $evV72$path).join(scratchDir, "Dancefile.inject"),
         "--tag",
         "dance:inject",
         cacheSource
     ]);
     // Clean Directories
-    await $evV72$rm(cacheSource, {
+    await (0, $evV72$fspromises).rm(cacheSource, {
         recursive: true,
         force: true
     });
@@ -757,7 +1247,7 @@ async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scra
     const { stdout: date } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("date", [
         "--iso=ns"
     ]);
-    await $evV72$writeFile($evV72$join(scratchDir, "buildstamp"), date);
+    await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
 FROM busybox:1
@@ -766,14 +1256,14 @@ RUN --mount=type=cache,target=${cacheTarget} \
     mkdir -p /var/dance-cache/ \
     && cp -p -R ${cacheTarget}/. /var/dance-cache/ || true
 `;
-    await $evV72$writeFile($evV72$join(scratchDir, "Dancefile.extract"), dancefileContent);
+    await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.extract"), dancefileContent);
     console.log(dancefileContent);
     // Extract Data into Docker Image
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
         "-f",
-        $evV72$join(scratchDir, "Dancefile.extract"),
+        (0, $evV72$path).join(scratchDir, "Dancefile.extract"),
         "--tag",
         "dance:extract",
         "--load",
@@ -803,7 +1293,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
         "cache-container:/var/dance-cache",
         "-"
     ]);
-    await $evV72$writeFile($evV72$join(scratchDir, "dance-cache.tar"), tarOutput);
+    await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "dance-cache.tar"), tarOutput);
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("tar", [
         "-H",
         "posix",
@@ -811,14 +1301,14 @@ RUN --mount=type=cache,target=${cacheTarget} \
         "-C",
         scratchDir,
         "-f",
-        $evV72$join(scratchDir, "dance-cache.tar")
+        (0, $evV72$path).join(scratchDir, "dance-cache.tar")
     ]);
     // Move Cache into Its Place
-    await $evV72$rm(cacheSource, {
+    await (0, $evV72$fspromises).rm(cacheSource, {
         recursive: true,
         force: true
     });
-    await $evV72$rename($evV72$join(scratchDir, "dance-cache"), cacheSource);
+    await (0, $evV72$fspromises).rename((0, $evV72$path).join(scratchDir, "dance-cache"), cacheSource);
 }
 async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
     if (opts["skip-extraction"]) {
@@ -837,10 +1327,10 @@ async function $bec5d2ddaaf4a876$var$main(args) {
     const opts = (0, $76d06fcdc9bff1f5$export$77714ac6976d0316)(args);
     if (opts.help) return (0, $76d06fcdc9bff1f5$export$34512e3b2db52a4e)();
     if (opts.extract) // Run the post step
-    (0, $8d40300f3635b768$export$bd3cfa0c41fc7012)(opts);
+    await (0, $8d40300f3635b768$export$bd3cfa0c41fc7012)(opts);
     else {
         // Otherwise, this is the main step
-        if (process.env.GITHUB_STATE !== undefined) await (0, $evV72$appendFile)(process.env.GITHUB_STATE, `POST=true${(0, $evV72$EOL)}`);
+        if (process.env.GITHUB_STATE !== undefined) await (0, $evV72$fspromises).appendFile(process.env.GITHUB_STATE, `POST=true${(0, $evV72$os).EOL}`);
         await (0, $bd1d73aff0732146$export$38c65e9f06d3d433)(opts);
     }
 }

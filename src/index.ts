@@ -1,5 +1,5 @@
-import { appendFile } from "fs/promises";
-import { EOL } from "os";
+import fs from "fs/promises";
+import os from "os";
 import { injectCaches } from "./inject-cache.js";
 import { extractCaches } from "./extract-cache.js";
 import { help, parseOpts } from "./opts.js";
@@ -13,11 +13,11 @@ async function main(args: string[]) {
 
   if (opts.extract) {
     // Run the post step
-    extractCaches(opts);
+    await extractCaches(opts);
   } else {
     // Otherwise, this is the main step
     if (process.env.GITHUB_STATE !== undefined) {
-      await appendFile(process.env.GITHUB_STATE, `POST=true${EOL}`);
+      await fs.appendFile(process.env.GITHUB_STATE, `POST=true${os.EOL}`);
     }
     await injectCaches(opts);
   }

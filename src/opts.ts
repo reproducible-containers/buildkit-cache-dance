@@ -1,4 +1,5 @@
 import mri from 'mri';
+import { getInput, warning } from '@actions/core';
 
 export type Opts = {
   "extract": boolean
@@ -6,22 +7,36 @@ export type Opts = {
   "scratch-dir": string
   "skip-extraction": boolean
   help: boolean
+  /** @deprecated Use `cache-map` instead */
+  "cache-source"?: string
+  /** @deprecated Use `cache-map` instead */
+  "cache-target"?: string
 }
 
 export function parseOpts(args: string[]): mri.Argv<Opts> {
-  return mri<Opts>(args, {
+  const opts = mri<Opts>(args, {
     default: {
       "cache-map": getInput("cache-map"),
       "scratch-dir": getInput("scratch-dir"),
       "skip-extraction": getInput("skip-extraction") === "true",
       "extract": process.env[`STATE_POST`] !== undefined,
     },
-    string: ["cache-map", "scratch-dir"],
+    string: ["cache-map", "scratch-dir", "cache-source", "cache-target"],
     boolean: ["skip-extraction", "help", "extract"],
     alias: {
       "help": ["h"],
     },
   })
+
+  if (opts["cache-source"] && opts["cache-target"]) {
+    warning("The `cache-source` and `cache-target` options are deprecated. Use `cache-map` instead.")
+
+    opts["cache-map"] = JSON.stringify({
+      [opts["cache-source"]]: opts["cache-target"],
+    });
+  }
+
+  return opts;
 }
 
 export function help() {
@@ -35,14 +50,6 @@ Options:
   --skip-extraction  Skip the extraction of the cache from the docker container
   --help         Show this help
 `);
-}
-
-/**
- * Get the action input value from the environment (INPUT_NAME)
- */
-function getInput(name: string) {
-  const val = process.env[`INPUT_${name.replace(/ /g, '_').toUpperCase()}`] || '';
-  return val.trim();
 }
 
 export function getCacheMap(opts: Opts): Record<string, string> {

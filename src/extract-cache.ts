@@ -1,5 +1,5 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import fs from 'fs/promises';
+import path from 'path';
 import { Opts, getCacheMap } from './opts.js';
 import { run } from './run.js';
 
