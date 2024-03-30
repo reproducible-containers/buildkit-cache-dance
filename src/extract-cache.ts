@@ -5,7 +5,7 @@ import { run } from './run.js';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting
-    const { stdout: date } = await run('date', ['--iso=ns']);
+    const { stdout: date } = await run('date', ['--iso=ns'], true);
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
 
     // Prepare Dancefile to Access Caches
@@ -31,7 +31,7 @@ RUN --mount=type=cache,target=${cacheTarget} \
     await run('docker', ['create', '-ti', '--name', 'cache-container', 'dance:extract']);
 
     // Unpack Docker Image into Scratch
-    const { stdout: tarOutput } = await run('docker', ['cp', '-L', 'cache-container:/var/dance-cache', '-']);
+    const { stdout: tarOutput } = await run('docker', ['cp', '-L', 'cache-container:/var/dance-cache', '-'], true);
     await fs.writeFile(path.join(scratchDir, 'dance-cache.tar'), tarOutput);
     await run('tar', ['-H', 'posix', '-x', '-C', scratchDir, '-f', path.join(scratchDir, 'dance-cache.tar')]);
 

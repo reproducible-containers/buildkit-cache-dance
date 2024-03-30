@@ -12,7 +12,7 @@ async function injectCache(cacheSource: string, cacheTarget: string, scratchDir:
     await fs.mkdir(cacheSource, { recursive: true });
 
     // Prepare Timestamp for Layer Cache Busting
-    const { stdout: date } = await run('date', ['--iso=ns']);
+    const { stdout: date } = await run('date', ['--iso=ns'], true);
     await fs.writeFile(path.join(cacheSource, 'buildstamp'), date);
 
     // Prepare Dancefile to Access Caches
