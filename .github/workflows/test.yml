@@ -27,7 +27,7 @@ jobs:
       - name: inject cache into docker
         uses: ./
         with:
-          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+          skip-extraction: false
           cache-map: |
             {
               "var-cache-apt": "/var/cache/apt",
