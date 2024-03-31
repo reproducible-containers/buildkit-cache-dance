@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "_version": "20.1.0",
+    "compilerOptions": {
+        "lib": ["ES2022"],
+        "target": "ES2022",
+        "moduleResolution": "Bundler",
+        "module": "Preserve",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "incremental": true,
+        "outDir": "dist",
+        "tsBuildInfoFile": "./node_modules/cache/.tsbuildinfo",
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+}

@@ -14,29 +14,26 @@ jobs:
         id: meta
         with:
           images: test
-      - name: Cache var-cache-apt
-        id: cache-var-cache-apt
-        uses: actions/cache@v3
+
+      - name: Cache
+        uses: actions/cache@v4
+        id: cache
         with:
-          path: var-cache-apt
-          key: var-cache-apt-${{ hashFiles('.github/workflows/test/Dockerfile') }}
-      - name: Cache var-lib-apt
-        id: cache-var-lib-apt
-        uses: actions/cache@v3
-        with:
-          path: var-lib-apt
-          key: var-lib-apt-${{ hashFiles('.github/workflows/test/Dockerfile') }}
-      - name: inject var-cache-apt into docker
+          path: |
+            var-cache-apt
+            var-lib-apt
+          key: cache-${{ hashFiles('.github/workflows/test/Dockerfile') }}
+
+      - name: inject cache into docker
         uses: ./
         with:
-          cache-source: var-cache-apt
-          cache-target: /var/cache/apt
-      - name: inject var-lib-apt into docker
-        uses: ./
-        with:
-          cache-source: var-lib-apt
-          cache-target: /var/lib/apt
-          skip-extraction: ${{ steps.cache-var-lib-apt.outputs.cache-hit }}
+          skip-extraction: false
+          cache-map: |
+            {
+              "var-cache-apt": "/var/cache/apt",
+              "var-lib-apt": "/var/lib/apt"
+            }
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
