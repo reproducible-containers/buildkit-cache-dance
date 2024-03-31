@@ -2,7 +2,7 @@ import * as $evV72$fs from "fs";
 import $evV72$fspromises from "fs/promises";
 import $evV72$os, * as $evV72$os1 from "os";
 import $evV72$path, * as $evV72$path1 from "path";
-import {spawn as $evV72$spawn, spawnSync as $evV72$spawnSync} from "child_process";
+import $evV72$child_process, {spawn as $evV72$spawn, spawnSync as $evV72$spawnSync} from "child_process";
 
 
 function $parcel$interopDefault(a) {
@@ -1179,20 +1179,55 @@ $92de28abfb9027ac$exports._enoent = $1ef36613317ba37d$exports;
 $03c48d50d9d7039f$exports = $03c48d50d9d7039f$var$spawnPlease;
 
 
+
 async function $4c028fad90f63861$export$889ea624f2cb2c57(command, args, captureOutput = false) {
     try {
         const spawnOpts = captureOutput ? {
-            stdout: "pipe",
-            stderr: "pipe"
+            stdio: [
+                "inherit",
+                "pipe",
+                "pipe"
+            ]
         } : {
-            stdout: "inherit",
-            stderr: "inherit"
+            stdio: "inherit"
         };
         return await (0, (/*@__PURE__*/$parcel$interopDefault($03c48d50d9d7039f$exports)))(command, args, {}, spawnOpts);
     } catch (error) {
         console.error(`Error running command: ${command} ${args.join(" ")}`);
         throw error;
     }
+}
+async function $4c028fad90f63861$export$214213e2e11c62ae([commannd1, args1], [command2, args2]) {
+    const cp1 = (0, $evV72$child_process).spawn(commannd1, args1, {
+        stdio: [
+            "inherit",
+            "pipe",
+            "inherit"
+        ]
+    });
+    const cp2 = (0, $evV72$child_process).spawn(command2, args2, {
+        stdio: [
+            "pipe",
+            "inherit",
+            "inherit"
+        ]
+    });
+    cp1.stdout.pipe(cp2.stdin);
+    await Promise.all([
+        $4c028fad90f63861$var$assertSuccess(cp1),
+        $4c028fad90f63861$var$assertSuccess(cp2)
+    ]);
+}
+function $4c028fad90f63861$var$assertSuccess(cp) {
+    return new Promise((resolve, reject)=>{
+        cp.on("error", (error)=>{
+            reject(error);
+        });
+        cp.on("close", (code)=>{
+            if (code !== 0) reject(new Error(`process exited with code ${code}`));
+            resolve();
+        });
+    });
 }
 
 
@@ -1297,21 +1332,23 @@ RUN --mount=type=cache,target=${cacheTarget} \
         "dance:extract"
     ]);
     // Unpack Docker Image into Scratch
-    const { stdout: tarOutput } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
-        "cp",
-        "-L",
-        "cache-container:/var/dance-cache",
-        "-"
-    ], true);
-    await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "dance-cache.tar"), tarOutput);
-    await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("tar", [
-        "-H",
-        "posix",
-        "-x",
-        "-C",
-        scratchDir,
-        "-f",
-        (0, $evV72$path).join(scratchDir, "dance-cache.tar")
+    await (0, $4c028fad90f63861$export$214213e2e11c62ae)([
+        "docker",
+        [
+            "cp",
+            "-L",
+            "cache-container:/var/dance-cache",
+            "-"
+        ]
+    ], [
+        "tar",
+        [
+            "-H",
+            "posix",
+            "-x",
+            "-C",
+            scratchDir
+        ]
     ]);
     // Move Cache into Its Place
     await (0, $evV72$fspromises).rm(cacheSource, {

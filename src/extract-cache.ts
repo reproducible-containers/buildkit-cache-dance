@@ -1,7 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { Opts, getCacheMap } from './opts.js';
-import { run } from './run.js';
+import { run, runPiped } from './run.js';
+import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting
@@ -31,9 +32,10 @@ RUN --mount=type=cache,target=${cacheTarget} \
     await run('docker', ['create', '-ti', '--name', 'cache-container', 'dance:extract']);
 
     // Unpack Docker Image into Scratch
-    const { stdout: tarOutput } = await run('docker', ['cp', '-L', 'cache-container:/var/dance-cache', '-'], true);
-    await fs.writeFile(path.join(scratchDir, 'dance-cache.tar'), tarOutput);
-    await run('tar', ['-H', 'posix', '-x', '-C', scratchDir, '-f', path.join(scratchDir, 'dance-cache.tar')]);
+    await runPiped(
+        ['docker', ['cp', '-L', 'cache-container:/var/dance-cache', '-']],
+        ['tar', ['-H', 'posix', '-x', '-C', scratchDir]]
+    );
 
     // Move Cache into Its Place
     await fs.rm(cacheSource, { recursive: true, force: true });
