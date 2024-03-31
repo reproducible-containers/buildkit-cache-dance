@@ -6,7 +6,7 @@ import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting
-    const { stdout: date } = await run('date', ['--iso=ns'], true);
+    const date = new Date().toISOString();
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
 
     // Prepare Dancefile to Access Caches

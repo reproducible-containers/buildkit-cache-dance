@@ -1,12 +1,9 @@
 import spawnPlease from 'spawn-please'
 import cp, { type SpawnOptions, type ChildProcess } from 'child_process';
 
-export async function run(command: string, args: string[], captureOutput = false) {
+export async function run(command: string, args: string[]) {
     try {
-        const spawnOpts: SpawnOptions = captureOutput ?
-            { stdio: ['inherit', 'pipe', 'pipe'] } :
-            { stdio: 'inherit' };
-        return await spawnPlease(command, args, {}, spawnOpts);
+        return await spawnPlease(command, args);
     } catch (error) {
         console.error(`Error running command: ${command} ${args.join(' ')}`);
         throw error;

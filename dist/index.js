@@ -1180,18 +1180,9 @@ $03c48d50d9d7039f$exports = $03c48d50d9d7039f$var$spawnPlease;
 
 
 
-async function $4c028fad90f63861$export$889ea624f2cb2c57(command, args, captureOutput = false) {
+async function $4c028fad90f63861$export$889ea624f2cb2c57(command, args) {
     try {
-        const spawnOpts = captureOutput ? {
-            stdio: [
-                "inherit",
-                "pipe",
-                "pipe"
-            ]
-        } : {
-            stdio: "inherit"
-        };
-        return await (0, (/*@__PURE__*/$parcel$interopDefault($03c48d50d9d7039f$exports)))(command, args, {}, spawnOpts);
+        return await (0, (/*@__PURE__*/$parcel$interopDefault($03c48d50d9d7039f$exports)))(command, args);
     } catch (error) {
         console.error(`Error running command: ${command} ${args.join(" ")}`);
         throw error;
@@ -1245,9 +1236,7 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scrat
         recursive: true
     });
     // Prepare Timestamp for Layer Cache Busting
-    const { stdout: date } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("date", [
-        "--iso=ns"
-    ], true);
+    const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(cacheSource, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
@@ -1289,9 +1278,7 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scratchDir) {
     // Prepare Timestamp for Layer Cache Busting
-    const { stdout: date } = await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("date", [
-        "--iso=ns"
-    ], true);
+    const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
