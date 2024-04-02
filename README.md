@@ -85,6 +85,21 @@ Real-world examples:
 - <https://github.com/rootless-containers/slirp4netns/blob/v1.2.2/.github/workflows/release.yaml#L18-L36>
 - <https://github.com/containers/fuse-overlayfs/blob/40e0f3c/.github/workflows/release.yaml#L17-L36>
 
+## CacheMap Options
+
+Optionally, instead of a single string for the `target`, you can provide an object with additional options that should be passed to `--mount=type=cache` in the values `cache-map` JSON. The `target` path must be present in the object as a property.
+
+```json
+{
+  "var-cache-apt": {
+    "target": "/var/cache/apt",
+    "sharing": "locked",
+    "id": "1"
+  },
+  "var-lib-apt": "/var/lib/apt"
+}
+```
+
 ## CLI Usage
 
 In other CI systems, you can run the script directly via `node`:

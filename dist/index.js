@@ -720,7 +720,7 @@ Save 'RUN --mount=type=cache' caches on GitHub Actions or other CI platforms
 
 Options:
   --extract      Extract the cache from the docker container (extract step). Otherwise, inject the cache (main step)
-  --cache-map    The map of actions source to container destination paths for the cache paths
+  --cache-map    The map of actions source paths to container destination paths or mount arguments
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
   --help         Show this help
@@ -731,6 +731,25 @@ function $76d06fcdc9bff1f5$export$8550a4d7282a21d0(opts) {
         return JSON.parse(opts["cache-map"]);
     } catch (e) {
         throw new Error(`Failed to parse cache map. Expected JSON, got:\n${opts["cache-map"]}\n${e}`);
+    }
+}
+function $76d06fcdc9bff1f5$export$febacabd0d01c81(cacheOptions) {
+    if (typeof cacheOptions === "string") // only the target path is provided
+    return cacheOptions;
+    else // object is provided
+    try {
+        return cacheOptions.target;
+    } catch (e) {
+        throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}\n${e}`);
+    }
+}
+function $76d06fcdc9bff1f5$export$238315f403b84074(cacheOptions) {
+    if (typeof cacheOptions === "string") // only the target path is provided
+    return `type=cache,target=${cacheOptions}`;
+    else {
+        // other options are provided
+        const otherOptions = Object.entries(cacheOptions).map(([key, value])=>`${key}=${value}`).join(",");
+        return `type=cache,${otherOptions}`;
     }
 }
 
@@ -1223,7 +1242,7 @@ function $4c028fad90f63861$var$assertSuccess(cp) {
 
 
 
-async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scratchDir) {
+async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir) {
     // Clean Scratch Directory
     await (0, $evV72$fspromises).rm(scratchDir, {
         recursive: true,
@@ -1239,13 +1258,15 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scrat
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(cacheSource, "buildstamp"), date);
+    const targetPath = (0, $76d06fcdc9bff1f5$export$febacabd0d01c81)(cacheOptions);
+    const mountArgs = (0, $76d06fcdc9bff1f5$export$238315f403b84074)(cacheOptions);
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,target=${cacheTarget} \
+RUN --mount=${mountArgs} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    cp -p -R /var/dance-cache/. ${cacheTarget} || true
+    cp -p -R /var/dance-cache/. ${targetPath} || true
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.inject"), dancefileContent);
     console.log(dancefileContent);
@@ -1274,7 +1295,7 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
     const scratchDir = opts["scratch-dir"];
     // Inject Caches for each source-target pair
-    for (const [cacheSource, cacheTarget] of Object.entries(cacheMap))await $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scratchDir);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir);
 }
 
 
@@ -1282,17 +1303,19 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 
 
-async function $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scratchDir) {
+async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
+    const targetPath = (0, $76d06fcdc9bff1f5$export$febacabd0d01c81)(cacheOptions);
+    const mountArgs = (0, $76d06fcdc9bff1f5$export$238315f403b84074)(cacheOptions);
     const dancefileContent = `
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,target=${cacheTarget} \
+RUN --mount=${mountArgs} \
     mkdir -p /var/dance-cache/ \
-    && cp -p -R ${cacheTarget}/. /var/dance-cache/ || true
+    && cp -p -R ${targetPath}/. /var/dance-cache/ || true
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.extract"), dancefileContent);
     console.log(dancefileContent);
@@ -1358,7 +1381,7 @@ async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
     const scratchDir = opts["scratch-dir"];
     // Extract Caches for each source-target pair
-    for (const [cacheSource, cacheTarget] of Object.entries(cacheMap))await $8d40300f3635b768$var$extractCache(cacheSource, cacheTarget, scratchDir);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir);
 }
 
 

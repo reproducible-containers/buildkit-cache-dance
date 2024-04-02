@@ -45,17 +45,54 @@ Save 'RUN --mount=type=cache' caches on GitHub Actions or other CI platforms
 
 Options:
   --extract      Extract the cache from the docker container (extract step). Otherwise, inject the cache (main step)
-  --cache-map    The map of actions source to container destination paths for the cache paths
+  --cache-map    The map of actions source paths to container destination paths or mount arguments
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
   --help         Show this help
 `);
 }
 
-export function getCacheMap(opts: Opts): Record<string, string> {
+export type SourcePath = string
+export type TargetPath = string
+export type ToStringable = {
+  toString(): string;
+}
+export type CacheOptions = TargetPath | { target: TargetPath } & Record<string, ToStringable>
+export type CacheMap = Record<SourcePath, CacheOptions>
+
+export function getCacheMap(opts: Opts): CacheMap {
   try {
-    return JSON.parse(opts["cache-map"]) as Record<string, string>;
+    return JSON.parse(opts["cache-map"]) as CacheMap;
   } catch (e) {
     throw new Error(`Failed to parse cache map. Expected JSON, got:\n${opts["cache-map"]}\n${e}`);
+  }
+}
+
+export function getTargetPath(cacheOptions: CacheOptions): TargetPath {
+  if (typeof cacheOptions === "string") {
+    // only the target path is provided
+    return cacheOptions;
+  } else {
+    // object is provided
+    try {
+      return cacheOptions.target;
+    } catch (e) {
+      throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}\n${e}`);
+    }
+  }
+}
+
+/**
+ * Convert a cache options to a string that is passed to --mount=
+ * @param CacheOptions The cache options to convert to a string
+ */
+export function getMountArgsString(cacheOptions: CacheOptions): string {
+  if (typeof cacheOptions === "string") {
+    // only the target path is provided
+    return `type=cache,target=${cacheOptions}`;
+  } else {
+    // other options are provided
+    const otherOptions = Object.entries(cacheOptions).map(([key, value]) => `${key}=${value}`).join(",");
+    return `type=cache,${otherOptions}`;
   }
 }

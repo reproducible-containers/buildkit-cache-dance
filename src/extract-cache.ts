@@ -1,21 +1,24 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { Opts, getCacheMap } from './opts.js';
+import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
 import { run, runPiped } from './run.js';
 import { spawn } from 'child_process';
 
-async function extractCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
+async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
 
     // Prepare Dancefile to Access Caches
+    const targetPath = getTargetPath(cacheOptions);
+    const mountArgs = getMountArgsString(cacheOptions);
+
     const dancefileContent = `
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,target=${cacheTarget} \
+RUN --mount=${mountArgs} \
     mkdir -p /var/dance-cache/ \
-    && cp -p -R ${cacheTarget}/. /var/dance-cache/ || true
+    && cp -p -R ${targetPath}/. /var/dance-cache/ || true
 `;
     await fs.writeFile(path.join(scratchDir, 'Dancefile.extract'), dancefileContent);
     console.log(dancefileContent);
@@ -52,7 +55,7 @@ export async function extractCaches(opts: Opts) {
     const scratchDir = opts['scratch-dir'];
 
     // Extract Caches for each source-target pair
-    for (const [cacheSource, cacheTarget] of Object.entries(cacheMap)) {
-        await extractCache(cacheSource, cacheTarget, scratchDir);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap)) {
+        await extractCache(cacheSource, cacheOptions, scratchDir);
     }
 }

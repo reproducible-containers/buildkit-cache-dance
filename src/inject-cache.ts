@@ -1,10 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { Opts, getCacheMap } from './opts.js';
+import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
 import { run } from './run.js';
 import { notice } from '@actions/core';
 
-async function injectCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
+async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
     // Clean Scratch Directory
     await fs.rm(scratchDir, { recursive: true, force: true });
     await fs.mkdir(scratchDir, { recursive: true });
@@ -16,13 +16,16 @@ async function injectCache(cacheSource: string, cacheTarget: string, scratchDir:
     const date = new Date().toISOString();
     await fs.writeFile(path.join(cacheSource, 'buildstamp'), date);
 
+    const targetPath = getTargetPath(cacheOptions);
+    const mountArgs = getMountArgsString(cacheOptions);
+
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
 FROM busybox:1
 COPY buildstamp buildstamp
-RUN --mount=type=cache,target=${cacheTarget} \
+RUN --mount=${mountArgs} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    cp -p -R /var/dance-cache/. ${cacheTarget} || true
+    cp -p -R /var/dance-cache/. ${targetPath} || true
 `;
     await fs.writeFile(path.join(scratchDir, 'Dancefile.inject'), dancefileContent);
     console.log(dancefileContent);
@@ -45,7 +48,7 @@ export async function injectCaches(opts: Opts) {
     const scratchDir = opts['scratch-dir'];
 
     // Inject Caches for each source-target pair
-    for (const [cacheSource, cacheTarget] of Object.entries(cacheMap)) {
-        await injectCache(cacheSource, cacheTarget, scratchDir);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap)) {
+        await injectCache(cacheSource, cacheOptions, scratchDir);
     }
 }
