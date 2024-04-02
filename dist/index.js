@@ -1222,6 +1222,7 @@ function $4c028fad90f63861$var$assertSuccess(cp) {
 }
 
 
+
 async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheTarget, scratchDir) {
     // Clean Scratch Directory
     await (0, $evV72$fspromises).rm(scratchDir, {
@@ -1259,10 +1260,15 @@ RUN --mount=type=cache,target=${cacheTarget} \
         cacheSource
     ]);
     // Clean Directories
-    await (0, $evV72$fspromises).rm(cacheSource, {
-        recursive: true,
-        force: true
-    });
+    try {
+        await (0, $evV72$fspromises).rm(cacheSource, {
+            recursive: true,
+            force: true
+        });
+    } catch (err) {
+        // Ignore Cleaning Errors
+        (0, $bbb9dac42384d004$exports.notice)(`Error while cleaning cache source directory: ${err}. Ignoring...`);
+    }
 }
 async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
