@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Opts, getCacheMap } from './opts.js';
 import { run } from './run.js';
+import { notice } from '@actions/core';
 
 async function injectCache(cacheSource: string, cacheTarget: string, scratchDir: string) {
     // Clean Scratch Directory
@@ -30,7 +31,12 @@ RUN --mount=type=cache,target=${cacheTarget} \
     await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.inject'), '--tag', 'dance:inject', cacheSource]);
 
     // Clean Directories
-    await fs.rm(cacheSource, { recursive: true, force: true });
+    try {
+        await fs.rm(cacheSource, { recursive: true, force: true });
+    } catch (err) {
+        // Ignore Cleaning Errors
+        notice(`Error while cleaning cache source directory: ${err}. Ignoring...`);
+    }
 }
 
 
