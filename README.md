@@ -93,7 +93,6 @@ Optionally, instead of a single string for the `target`, you can provide an obje
 {
   "var-cache-apt": {
     "target": "/var/cache/apt",
-    "sharing": "locked",
     "id": "1"
   },
   "var-lib-apt": "/var/lib/apt"

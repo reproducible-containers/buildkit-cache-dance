@@ -30,7 +30,10 @@ jobs:
           skip-extraction: false
           cache-map: |
             {
-              "var-cache-apt": "/var/cache/apt",
+              "var-cache-apt": {
+                "target": "/var/cache/apt",
+                "id": "1"
+              },
               "var-lib-apt": "/var/lib/apt"
             }
 
