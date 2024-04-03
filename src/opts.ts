@@ -16,10 +16,11 @@ export type Opts = {
 export function parseOpts(args: string[]): mri.Argv<Opts> {
   const opts = mri<Opts>(args, {
     default: {
-      "cache-map": getInput("cache-map"),
-      "scratch-dir": getInput("scratch-dir"),
-      "skip-extraction": getInput("skip-extraction") === "true",
+      "cache-map": getInput("cache-map") || "{}",
+      "scratch-dir": getInput("scratch-dir") || "scratch",
+      "skip-extraction": (getInput("skip-extraction") || "false") === "true",
       "extract": process.env[`STATE_POST`] !== undefined,
+      "help": false,
     },
     string: ["cache-map", "scratch-dir", "cache-source", "cache-target"],
     boolean: ["skip-extraction", "help", "extract"],
@@ -74,10 +75,10 @@ export function getTargetPath(cacheOptions: CacheOptions): TargetPath {
     return cacheOptions;
   } else {
     // object is provided
-    try {
+    if ("target" in cacheOptions) {
       return cacheOptions.target;
-    } catch (e) {
-      throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}\n${e}`);
+    } else {
+      throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}`);
     }
   }
 }

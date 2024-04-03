@@ -684,10 +684,11 @@ $bbb9dac42384d004$exports.getState = $bbb9dac42384d004$var$getState;
 function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
     const opts = (0, $ec42a3295e12ea98$export$2e2bcd8739ae039)(args, {
         default: {
-            "cache-map": (0, $bbb9dac42384d004$exports.getInput)("cache-map"),
-            "scratch-dir": (0, $bbb9dac42384d004$exports.getInput)("scratch-dir"),
-            "skip-extraction": (0, $bbb9dac42384d004$exports.getInput)("skip-extraction") === "true",
-            "extract": process.env[`STATE_POST`] !== undefined
+            "cache-map": (0, $bbb9dac42384d004$exports.getInput)("cache-map") || "{}",
+            "scratch-dir": (0, $bbb9dac42384d004$exports.getInput)("scratch-dir") || "scratch",
+            "skip-extraction": ((0, $bbb9dac42384d004$exports.getInput)("skip-extraction") || "false") === "true",
+            "extract": process.env[`STATE_POST`] !== undefined,
+            "help": false
         },
         string: [
             "cache-map",
@@ -736,11 +737,10 @@ function $76d06fcdc9bff1f5$export$8550a4d7282a21d0(opts) {
 function $76d06fcdc9bff1f5$export$febacabd0d01c81(cacheOptions) {
     if (typeof cacheOptions === "string") // only the target path is provided
     return cacheOptions;
-    else // object is provided
-    try {
-        return cacheOptions.target;
-    } catch (e) {
-        throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}\n${e}`);
+    else {
+        // object is provided
+        if ("target" in cacheOptions) return cacheOptions.target;
+        else throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}`);
     }
 }
 function $76d06fcdc9bff1f5$export$238315f403b84074(cacheOptions) {
