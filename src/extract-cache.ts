@@ -2,7 +2,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
 import { run, runPiped } from './run.js';
-import { spawn } from 'child_process';
 
 async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting

@@ -1207,8 +1207,8 @@ async function $4c028fad90f63861$export$889ea624f2cb2c57(command, args) {
         throw error;
     }
 }
-async function $4c028fad90f63861$export$214213e2e11c62ae([commannd1, args1], [command2, args2]) {
-    const cp1 = (0, $evV72$child_process).spawn(commannd1, args1, {
+async function $4c028fad90f63861$export$214213e2e11c62ae([command1, args1], [command2, args2]) {
+    const cp1 = (0, $evV72$child_process).spawn(command1, args1, {
         stdio: [
             "inherit",
             "pipe",
