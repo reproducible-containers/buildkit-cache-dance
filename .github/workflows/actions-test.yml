@@ -1,10 +1,10 @@
 ---
-name: Test
+name: Actions Test
 on:
   push:
   pull_request:
 jobs:
-  test:
+  actions_test:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
