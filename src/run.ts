@@ -1,5 +1,5 @@
 import spawnPlease from 'spawn-please'
-import cp, { type SpawnOptions, type ChildProcess } from 'child_process';
+import cp, { type ChildProcess } from 'child_process';
 
 export async function run(command: string, args: string[]) {
     try {
@@ -10,8 +10,8 @@ export async function run(command: string, args: string[]) {
     }
 }
 
-export async function runPiped([commannd1, args1]: [string, string[]], [command2, args2]: [string, string[]]) {
-    const cp1 = cp.spawn(commannd1, args1, { stdio: ['inherit', 'pipe', 'inherit'] });
+export async function runPiped([command1, args1]: [string, string[]], [command2, args2]: [string, string[]]) {
+    const cp1 = cp.spawn(command1, args1, { stdio: ['inherit', 'pipe', 'inherit'] });
     const cp2 = cp.spawn(command2, args2, { stdio: ['pipe', 'inherit', 'inherit'] });
 
     cp1.stdout.pipe(cp2.stdin);

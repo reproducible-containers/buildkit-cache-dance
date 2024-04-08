@@ -59,7 +59,7 @@ jobs:
           key: cache-${{ hashFiles('.github/workflows/test/Dockerfile') }}
 
       - name: inject cache into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.0.0
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
         with:
           cache-map: |
             {
@@ -85,24 +85,43 @@ Real-world examples:
 - <https://github.com/rootless-containers/slirp4netns/blob/v1.2.2/.github/workflows/release.yaml#L18-L36>
 - <https://github.com/containers/fuse-overlayfs/blob/40e0f3c/.github/workflows/release.yaml#L17-L36>
 
+## CacheMap Options
+
+Optionally, instead of a single string for the `target`, you can provide an object with additional options that should be passed to `--mount=type=cache` in the values `cache-map` JSON. The `target` path must be present in the object as a property.
+
+```yaml
+      - name: inject cache into docker
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "var-cache-apt": {
+                "target": "/var/cache/apt",
+                "id": "1"
+              },
+              "var-lib-apt": "/var/lib/apt"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+```
+
 ## CLI Usage
 
 In other CI systems, you can run the script directly via `node`:
 
 ```shell
-curl -LJO https://github.com/reproducible-containers/buildkit-cache-dance/archive/refs/tags/v3.0.0.tar.gz
-tar xvf buildkit-cache-dance-3.0.0.tar.gz
+curl -LJO https://github.com/reproducible-containers/buildkit-cache-dance/archive/refs/tags/v3.1.0.tar.gz
+tar xvf buildkit-cache-dance-3.1.0.tar.gz
 ```
 During injection:
 
 ```shell
-node  ./buildkit-cache-dance-3.0.0/dist/index.js --cache-map '{"var-cache-apt": "/var/cache/apt", "var-lib-apt": "/var/lib/apt"}'
+node  ./buildkit-cache-dance-3.1.0/dist/index.js --cache-map '{"var-cache-apt": "/var/cache/apt", "var-lib-apt": "/var/lib/apt"}'
 ```
 
 After build during extraction:
 
 ```shell
-node  ./buildkit-cache-dance-3.0.0/dist/index.js --extract --cache-map '{"var-cache-apt": "/var/cache/apt", "var-lib-apt": "/var/lib/apt"}'
+node  ./buildkit-cache-dance-3.1.0/dist/index.js --extract --cache-map '{"var-cache-apt": "/var/cache/apt", "var-lib-apt": "/var/lib/apt"}'
 ```
 
 Here are the available options:

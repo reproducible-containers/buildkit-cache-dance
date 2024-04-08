@@ -1,13 +1,14 @@
 {
   "name": "buildkit-cache-dance",
-  "version": "3.0.0",
-  "description": "",
+  "version": "3.1.0",
+  "description": "Save `RUN --mount=type=cache` caches on GitHub Actions or other CI platforms",
   "main": "dist/index.js",
   "source": "src/index.ts",
   "type": "module",
   "scripts": {
     "build": "parcel build",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "vitest"
   },
   "keywords": [
     "buildkit",
@@ -25,7 +26,8 @@
   "devDependencies": {
     "@types/node": "^20.11.30",
     "parcel": "^2.12.0",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
   },
   "dependencies": {
     "@actions/core": "~1.5.0",

@@ -1,4 +1,4 @@
-name: Check Dist
+name: Tests
 
 on:
   pull_request:
@@ -8,8 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  check-dist:
-    name: Check dist/
+  tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,3 +43,6 @@ jobs:
           name: dist
           path: dist/
           retention-days: 10
+
+      - name: Run Tests
+        run: pnpm run test

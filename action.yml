@@ -3,7 +3,7 @@ description: "Injects the cached data into the docker build(x|kit) process"
 inputs:
   cache-map:
     required: true
-    description: "The map of actions source to container destination paths for the cache paths"
+    description: "The map of actions source paths to container destination paths or mount arguments"
   cache-source:
     deprecationMessage: "Use `cache-map` instead"
     description: "Where the cache is stored in the calling workspace. Default: `cache`"
