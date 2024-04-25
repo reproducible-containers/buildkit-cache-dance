@@ -6,6 +6,8 @@ import { run, runPiped } from './run.js';
 async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
+    
+    await fs.mkdir(scratchDir, { recursive: true });
     await fs.writeFile(path.join(scratchDir, 'buildstamp'), date);
 
     // Prepare Dancefile to Access Caches
