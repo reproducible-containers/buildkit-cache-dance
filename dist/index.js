@@ -1306,6 +1306,9 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
+    await (0, $evV72$fspromises).mkdir(scratchDir, {
+        recursive: true
+    });
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "buildstamp"), date);
     // Prepare Dancefile to Access Caches
     const targetPath = (0, $76d06fcdc9bff1f5$export$febacabd0d01c81)(cacheOptions);
