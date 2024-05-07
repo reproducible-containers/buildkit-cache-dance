@@ -16,7 +16,11 @@ inputs:
   skip-extraction:
     default: "false"
     description: "Skip the extraction of the cache from the docker container"
+  save-always:
+    default: "false"
+    description: "Run the post step to save the cache even if another step before fails"
 runs:
   using: 'node20'
   main: 'dist/index.js'
   post: 'dist/index.js'
+  post-if: 'success() || github.event.inputs.save-always'
