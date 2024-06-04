@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
+import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getUID, getGID } from './opts.js';
 import { run } from './run.js';
 import { notice } from '@actions/core';
 
@@ -19,13 +19,21 @@ async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scra
     const targetPath = getTargetPath(cacheOptions);
     const mountArgs = getMountArgsString(cacheOptions);
 
+    // If UID OR GID are set, then add chown to restore files ownership.
+    let ownershipCommand = "";
+    const uid = getUID(cacheOptions);
+    const gid = getGID(cacheOptions);
+    if (uid !== "" || gid !== "") {
+        ownershipCommand = `&& chown -R ${uid}:${gid} ${targetPath}`
+    }
+
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
 FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    cp -p -R /var/dance-cache/. ${targetPath} || true
+    cp -p -R /var/dance-cache/. ${targetPath} ${ownershipCommand} || true
 `;
     await fs.writeFile(path.join(scratchDir, 'Dancefile.inject'), dancefileContent);
     console.log(dancefileContent);

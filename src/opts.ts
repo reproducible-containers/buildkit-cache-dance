@@ -83,6 +83,34 @@ export function getTargetPath(cacheOptions: CacheOptions): TargetPath {
   }
 }
 
+export function getUID(cacheOptions: CacheOptions): string {
+  if (typeof cacheOptions === "string") {
+    // only the target path is provided
+    return "";
+  } else {
+    // object is provided
+    if ("uid" in cacheOptions && cacheOptions.uid !== undefined) {
+      return cacheOptions.uid.toString();
+    } else {
+      return "";
+    }
+  }
+}
+
+export function getGID(cacheOptions: CacheOptions): string {
+  if (typeof cacheOptions === "string") {
+    // only the target path is provided
+    return "";
+  } else {
+    // object is provided
+    if ("gid" in cacheOptions && cacheOptions.gid !== undefined) {
+      return cacheOptions.gid.toString();
+    } else {
+      return "";
+    }
+  }
+}
+
 /**
  * Convert a cache options to a string that is passed to --mount=
  * @param CacheOptions The cache options to convert to a string
