@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
 import { run, runPiped } from './run.js';
+import { notice } from '@actions/core';
 
 async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
     // Prepare Timestamp for Layer Cache Busting
@@ -41,8 +42,15 @@ RUN --mount=${mountArgs} \
         ['tar', ['-H', 'posix', '-x', '-C', scratchDir]]
     );
 
+    // Clean Directories
+    try {
+        await fs.rm(cacheSource, { recursive: true, force: true });
+    } catch (err) {
+        // Ignore Cleaning Errors
+        notice(`Error while cleaning cache source directory: ${err}. Ignoring...`);
+    }
+
     // Move Cache into Its Place
-    await fs.rm(cacheSource, { recursive: true, force: true });
     await fs.rename(path.join(scratchDir, 'dance-cache'), cacheSource);
 }
 
