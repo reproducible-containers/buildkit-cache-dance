@@ -743,6 +743,24 @@ function $76d06fcdc9bff1f5$export$febacabd0d01c81(cacheOptions) {
         else throw new Error(`Expected the 'target' key in the cache options, got:\n${cacheOptions}`);
     }
 }
+function $76d06fcdc9bff1f5$export$6d2b3473b0986646(cacheOptions) {
+    if (typeof cacheOptions === "string") // only the target path is provided
+    return "";
+    else {
+        // object is provided
+        if ("uid" in cacheOptions && cacheOptions.uid !== undefined) return cacheOptions.uid.toString();
+        else return "";
+    }
+}
+function $76d06fcdc9bff1f5$export$4e7da3a92c2dad69(cacheOptions) {
+    if (typeof cacheOptions === "string") // only the target path is provided
+    return "";
+    else {
+        // object is provided
+        if ("gid" in cacheOptions && cacheOptions.gid !== undefined) return cacheOptions.gid.toString();
+        else return "";
+    }
+}
 function $76d06fcdc9bff1f5$export$238315f403b84074(cacheOptions) {
     if (typeof cacheOptions === "string") // only the target path is provided
     return `type=cache,target=${cacheOptions}`;
@@ -1260,13 +1278,18 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scra
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(cacheSource, "buildstamp"), date);
     const targetPath = (0, $76d06fcdc9bff1f5$export$febacabd0d01c81)(cacheOptions);
     const mountArgs = (0, $76d06fcdc9bff1f5$export$238315f403b84074)(cacheOptions);
+    // If UID OR GID are set, then add chown to restore files ownership.
+    let ownershipCommand = "";
+    const uid = (0, $76d06fcdc9bff1f5$export$6d2b3473b0986646)(cacheOptions);
+    const gid = (0, $76d06fcdc9bff1f5$export$4e7da3a92c2dad69)(cacheOptions);
+    if (uid !== "" || gid !== "") ownershipCommand = `&& chown -R ${uid}:${gid} ${targetPath}`;
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
 FROM busybox:1
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     --mount=type=bind,source=.,target=/var/dance-cache \
-    cp -p -R /var/dance-cache/. ${targetPath} || true
+    cp -p -R /var/dance-cache/. ${targetPath} ${ownershipCommand} || true
 `;
     await (0, $evV72$fspromises).writeFile((0, $evV72$path).join(scratchDir, "Dancefile.inject"), dancefileContent);
     console.log(dancefileContent);

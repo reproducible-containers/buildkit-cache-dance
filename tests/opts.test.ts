@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { getCacheMap, getTargetPath, getMountArgsString, parseOpts } from '../src/opts.js'
+import { getCacheMap, getTargetPath, getMountArgsString, parseOpts, getUID, getGID } from '../src/opts.js'
 
 test('parseOpts with no arguments', () => {
     const opts = parseOpts([])
@@ -93,4 +93,42 @@ test('getMountArgsString with object', () => {
     const cacheOptions = { target: 'targetPath', shared: true, id: 1 }
     const mountString = getMountArgsString(cacheOptions)
     expect(mountString).toBe('type=cache,target=targetPath,shared=true,id=1')
+})
+
+test('getUID with string', () => {
+    const cacheOptions = 'targetPath'
+    const uid = getUID(cacheOptions)
+    expect(uid).toBe('')
+})
+
+
+test('getUID with object without uid', () => {
+    const cacheOptions = { target: 'targetPath', shared: true, id: 1 }
+    const uid = getUID(cacheOptions)
+    expect(uid).toBe('')
+})
+
+test('getUID with object with uid', () => {
+    const cacheOptions = { target: 'targetPath', shared: true, id: 1, uid: 1000 }
+    const uid = getUID(cacheOptions)
+    expect(uid).toBe('1000')
+})
+
+test('getGID with string', () => {
+    const cacheOptions = 'targetPath'
+    const gid = getGID(cacheOptions)
+    expect(gid).toBe('')
+})
+
+
+test('getGID with object without gid', () => {
+    const cacheOptions = { target: 'targetPath', shared: true, id: 1 }
+    const gid = getGID(cacheOptions)
+    expect(gid).toBe('')
+})
+
+test('getGID with object with gid', () => {
+    const cacheOptions = { target: 'targetPath', shared: true, id: 1, gid: 1000 }
+    const gid = getGID(cacheOptions)
+    expect(gid).toBe('1000')
 })
