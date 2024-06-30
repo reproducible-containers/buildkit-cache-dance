@@ -1393,10 +1393,11 @@ RUN --mount=${mountArgs} \
         ]
     ]);
     // Move Cache into Its Place
-    await (0, $evV72$fspromises).rm(cacheSource, {
-        recursive: true,
-        force: true
-    });
+    await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("sudo", [
+        "rm",
+        "-rf",
+        cacheSource
+    ]);
     await (0, $evV72$fspromises).rename((0, $evV72$path).join(scratchDir, "dance-cache"), cacheSource);
 }
 async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
