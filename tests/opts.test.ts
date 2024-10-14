@@ -10,7 +10,8 @@ test('parseOpts with no arguments', () => {
         "skip-extraction": false,
         "extract": false,
         "h": false,
-        "help": false
+        "help": false,
+        "utility-image": "ghcr.io/containerd/busybox:latest"
     })
 })
 
@@ -23,7 +24,8 @@ test('parseOpts with cache-map argument', () => {
         "skip-extraction": false,
         "extract": false,
         "h": false,
-        "help": false
+        "help": false,
+        "utility-image": "ghcr.io/containerd/busybox:latest"
     })
 })
 
@@ -38,7 +40,22 @@ test('parseOpts with deprecated cache-source and cache-target arguments', () => 
         "h": false,
         "help": false,
         "cache-source": 'source',
-        "cache-target": 'target'
+        "cache-target": 'target',
+        "utility-image": "ghcr.io/containerd/busybox:latest"
+    })
+})
+
+test('parseOpts with utility-image argument', () => {
+    const opts = parseOpts(['--utility-image', 'alpine:1'])
+    expect(opts).toEqual({
+        "_": [],
+        "cache-map": '{}',
+        "scratch-dir": "scratch",
+        "skip-extraction": false,
+        "extract": false,
+        "h": false,
+        "help": false,
+        "utility-image": "alpine:1"
     })
 })
 
@@ -52,6 +69,7 @@ test('parseOpts with help argument', () => {
         "extract": false,
         "h": true,
         "help": true,
+        "utility-image": "ghcr.io/containerd/busybox:latest"
     })
 })
 
