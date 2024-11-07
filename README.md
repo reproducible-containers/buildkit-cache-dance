@@ -135,6 +135,7 @@ Options:
   --cache-map    The map of actions source to container destination paths for the cache paths
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
+  --builder     The name of the buildx builder. Default: 'default'
   --help         Show this help
 ```
 

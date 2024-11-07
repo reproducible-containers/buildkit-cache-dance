@@ -1,10 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getUID, getGID } from './opts.js';
+import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getUID, getGID, getBuilder } from './opts.js';
 import { run } from './run.js';
 import { notice } from '@actions/core';
 
-async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string) {
+async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string, builder: string) {
     // Clean Scratch Directory
     await fs.rm(scratchDir, { recursive: true, force: true });
     await fs.mkdir(scratchDir, { recursive: true });
@@ -39,7 +39,7 @@ RUN --mount=${mountArgs} \
     console.log(dancefileContent);
 
     // Inject Data into Docker Cache
-    await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.inject'), '--tag', 'dance:inject', cacheSource]);
+    await run('docker', ['buildx', 'build', '--builder', builder ,'-f', path.join(scratchDir, 'Dancefile.inject'), '--tag', 'dance:inject', cacheSource]);
 
     // Clean Directories
     try {
@@ -56,8 +56,9 @@ export async function injectCaches(opts: Opts) {
     const scratchDir = opts['scratch-dir'];
     const containerImage = opts['utility-image'];
 
+    const builder = getBuilder(opts);
     // Inject Caches for each source-target pair
     for (const [cacheSource, cacheOptions] of Object.entries(cacheMap)) {
-        await injectCache(cacheSource, cacheOptions, scratchDir, containerImage);
+        await injectCache(cacheSource, cacheOptions, scratchDir, containerImage, builder);
     }
 }

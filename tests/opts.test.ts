@@ -11,7 +11,8 @@ test('parseOpts with no arguments', () => {
         "extract": false,
         "h": false,
         "help": false,
-        "utility-image": "ghcr.io/containerd/busybox:latest"
+        "utility-image": "ghcr.io/containerd/busybox:latest",
+        "builder": "default"
     })
 })
 
@@ -25,7 +26,8 @@ test('parseOpts with cache-map argument', () => {
         "extract": false,
         "h": false,
         "help": false,
-        "utility-image": "ghcr.io/containerd/busybox:latest"
+        "utility-image": "ghcr.io/containerd/busybox:latest",
+        "builder": "default"
     })
 })
 
@@ -41,7 +43,8 @@ test('parseOpts with deprecated cache-source and cache-target arguments', () => 
         "help": false,
         "cache-source": 'source',
         "cache-target": 'target',
-        "utility-image": "ghcr.io/containerd/busybox:latest"
+        "utility-image": "ghcr.io/containerd/busybox:latest",
+        "builder": "default"
     })
 })
 
@@ -55,7 +58,23 @@ test('parseOpts with utility-image argument', () => {
         "extract": false,
         "h": false,
         "help": false,
-        "utility-image": "alpine:1"
+        "utility-image": "alpine:1",
+        "builder": "default"
+    })
+})
+
+test('parseOpts with builder argument', () => {
+    const opts = parseOpts(['--builder', 'another-builder'])
+    expect(opts).toEqual({
+        "_": [],
+        "cache-map": '{}',
+        "scratch-dir": "scratch",
+        "skip-extraction": false,
+        "extract": false,
+        "h": false,
+        "help": false,
+        "utility-image": "ghcr.io/containerd/busybox:latest",
+        "builder": "another-builder"
     })
 })
 
@@ -69,7 +88,8 @@ test('parseOpts with help argument', () => {
         "extract": false,
         "h": true,
         "help": true,
-        "utility-image": "ghcr.io/containerd/busybox:latest"
+        "utility-image": "ghcr.io/containerd/busybox:latest",
+        "builder": "default"
     })
 })
 

@@ -689,6 +689,7 @@ function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
             "skip-extraction": ((0, $bbb9dac42384d004$exports.getInput)("skip-extraction") || "false") === "true",
             "extract": process.env[`STATE_POST`] !== undefined,
             "utility-image": (0, $bbb9dac42384d004$exports.getInput)("utility-image") || "ghcr.io/containerd/busybox:latest",
+            "builder": (0, $bbb9dac42384d004$exports.getInput)("builder") || "default",
             "help": false
         },
         string: [
@@ -696,7 +697,8 @@ function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
             "scratch-dir",
             "cache-source",
             "cache-target",
-            "utility-image"
+            "utility-image",
+            "builder"
         ],
         boolean: [
             "skip-extraction",
@@ -727,6 +729,7 @@ Options:
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
   --utility-image  The container image to use for injecting and extracting the cache. Default: 'ghcr.io/containerd/busybox:latest'
+  --builder      The name of the buildx builder to use for the cache injection
   --help         Show this help
 `);
 }
@@ -772,6 +775,9 @@ function $76d06fcdc9bff1f5$export$238315f403b84074(cacheOptions) {
         const otherOptions = Object.entries(cacheOptions).map(([key, value])=>`${key}=${value}`).join(",");
         return `type=cache,${otherOptions}`;
     }
+}
+function $76d06fcdc9bff1f5$export$932deacb99c42350(opts) {
+    return opts["builder"] == null || opts["builder"] == "" ? "default" : opts["builder"];
 }
 
 
@@ -1263,7 +1269,7 @@ function $4c028fad90f63861$var$assertSuccess(cp) {
 
 
 
-async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir, containerImage) {
+async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir, containerImage, builder) {
     // Clean Scratch Directory
     await (0, $evV72$fspromises).rm(scratchDir, {
         recursive: true,
@@ -1300,6 +1306,8 @@ RUN --mount=${mountArgs} \
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
+        "--builder",
+        builder,
         "-f",
         (0, $evV72$path).join(scratchDir, "Dancefile.inject"),
         "--tag",
@@ -1321,8 +1329,9 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
     const scratchDir = opts["scratch-dir"];
     const containerImage = opts["utility-image"];
+    const builder = (0, $76d06fcdc9bff1f5$export$932deacb99c42350)(opts);
     // Inject Caches for each source-target pair
-    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir, containerImage);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir, containerImage, builder);
 }
 
 
@@ -1330,7 +1339,7 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 
 
-async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir, containerImage) {
+async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir, containerImage, builder) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).mkdir(scratchDir, {
@@ -1353,6 +1362,8 @@ RUN --mount=${mountArgs} \
     await (0, $4c028fad90f63861$export$889ea624f2cb2c57)("docker", [
         "buildx",
         "build",
+        "--builder",
+        builder,
         "-f",
         (0, $evV72$path).join(scratchDir, "Dancefile.extract"),
         "--tag",
@@ -1412,8 +1423,9 @@ async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
     const scratchDir = opts["scratch-dir"];
     const containerImage = opts["utility-image"];
+    const builder = (0, $76d06fcdc9bff1f5$export$932deacb99c42350)(opts);
     // Extract Caches for each source-target pair
-    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir, containerImage);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir, containerImage, builder);
 }
 
 

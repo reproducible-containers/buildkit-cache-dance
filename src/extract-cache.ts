@@ -1,9 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
+import {CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getBuilder} from './opts.js';
 import { run, runPiped } from './run.js';
 
-async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string) {
+async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string, builder: string) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
 
@@ -25,7 +25,7 @@ RUN --mount=${mountArgs} \
     console.log(dancefileContent);
 
     // Extract Data into Docker Image
-    await run('docker', ['buildx', 'build', '-f', path.join(scratchDir, 'Dancefile.extract'), '--tag', 'dance:extract', '--load', scratchDir]);
+    await run('docker', ['buildx', 'build', '--builder', builder, '-f', path.join(scratchDir, 'Dancefile.extract'), '--tag', 'dance:extract', '--load', scratchDir]);
 
     // Create Extraction Image
     try {
@@ -55,9 +55,10 @@ export async function extractCaches(opts: Opts) {
     const cacheMap = getCacheMap(opts);
     const scratchDir = opts['scratch-dir'];
     const containerImage = opts['utility-image'];
+    const builder = getBuilder(opts);
 
     // Extract Caches for each source-target pair
     for (const [cacheSource, cacheOptions] of Object.entries(cacheMap)) {
-        await extractCache(cacheSource, cacheOptions, scratchDir, containerImage);
+        await extractCache(cacheSource, cacheOptions, scratchDir, containerImage, builder);
     }
 }
