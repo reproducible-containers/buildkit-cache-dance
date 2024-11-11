@@ -3,7 +3,7 @@ import path from 'path';
 import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
 import { run, runPiped } from './run.js';
 
-async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
+async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
 
@@ -15,7 +15,7 @@ async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scr
     const mountArgs = getMountArgsString(cacheOptions);
 
     const dancefileContent = `
-FROM busybox:1
+FROM ${containerImage}
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     mkdir -p /var/dance-cache/ \
@@ -54,9 +54,10 @@ export async function extractCaches(opts: Opts) {
 
     const cacheMap = getCacheMap(opts);
     const scratchDir = opts['scratch-dir'];
+    const containerImage = opts['utility-image'];
 
     // Extract Caches for each source-target pair
     for (const [cacheSource, cacheOptions] of Object.entries(cacheMap)) {
-        await extractCache(cacheSource, cacheOptions, scratchDir);
+        await extractCache(cacheSource, cacheOptions, scratchDir, containerImage);
     }
 }

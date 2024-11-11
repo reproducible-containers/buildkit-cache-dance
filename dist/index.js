@@ -688,13 +688,15 @@ function $76d06fcdc9bff1f5$export$77714ac6976d0316(args) {
             "scratch-dir": (0, $bbb9dac42384d004$exports.getInput)("scratch-dir") || "scratch",
             "skip-extraction": ((0, $bbb9dac42384d004$exports.getInput)("skip-extraction") || "false") === "true",
             "extract": process.env[`STATE_POST`] !== undefined,
+            "utility-image": (0, $bbb9dac42384d004$exports.getInput)("utility-image") || "ghcr.io/containerd/busybox:latest",
             "help": false
         },
         string: [
             "cache-map",
             "scratch-dir",
             "cache-source",
-            "cache-target"
+            "cache-target",
+            "utility-image"
         ],
         boolean: [
             "skip-extraction",
@@ -724,6 +726,7 @@ Options:
   --cache-map    The map of actions source paths to container destination paths or mount arguments
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
+  --utility-image  The container image to use for injecting and extracting the cache. Default: 'ghcr.io/containerd/busybox:latest'
   --help         Show this help
 `);
 }
@@ -1260,7 +1263,7 @@ function $4c028fad90f63861$var$assertSuccess(cp) {
 
 
 
-async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir) {
+async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir, containerImage) {
     // Clean Scratch Directory
     await (0, $evV72$fspromises).rm(scratchDir, {
         recursive: true,
@@ -1285,7 +1288,7 @@ async function $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scra
     if (uid !== "" || gid !== "") ownershipCommand = `&& chown -R ${uid}:${gid} ${targetPath}`;
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
-FROM busybox:1
+FROM ${containerImage}
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     --mount=type=bind,source=.,target=/var/dance-cache \
@@ -1317,8 +1320,9 @@ RUN --mount=${mountArgs} \
 async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
     const scratchDir = opts["scratch-dir"];
+    const containerImage = opts["utility-image"];
     // Inject Caches for each source-target pair
-    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $bd1d73aff0732146$var$injectCache(cacheSource, cacheOptions, scratchDir, containerImage);
 }
 
 
@@ -1326,7 +1330,7 @@ async function $bd1d73aff0732146$export$38c65e9f06d3d433(opts) {
 
 
 
-async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir) {
+async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir, containerImage) {
     // Prepare Timestamp for Layer Cache Busting
     const date = new Date().toISOString();
     await (0, $evV72$fspromises).mkdir(scratchDir, {
@@ -1337,7 +1341,7 @@ async function $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scr
     const targetPath = (0, $76d06fcdc9bff1f5$export$febacabd0d01c81)(cacheOptions);
     const mountArgs = (0, $76d06fcdc9bff1f5$export$238315f403b84074)(cacheOptions);
     const dancefileContent = `
-FROM busybox:1
+FROM ${containerImage}
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     mkdir -p /var/dance-cache/ \
@@ -1407,8 +1411,9 @@ async function $8d40300f3635b768$export$bd3cfa0c41fc7012(opts) {
     }
     const cacheMap = (0, $76d06fcdc9bff1f5$export$8550a4d7282a21d0)(opts);
     const scratchDir = opts["scratch-dir"];
+    const containerImage = opts["utility-image"];
     // Extract Caches for each source-target pair
-    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir);
+    for (const [cacheSource, cacheOptions] of Object.entries(cacheMap))await $8d40300f3635b768$var$extractCache(cacheSource, cacheOptions, scratchDir, containerImage);
 }
 
 

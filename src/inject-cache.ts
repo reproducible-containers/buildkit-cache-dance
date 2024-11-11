@@ -4,7 +4,7 @@ import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, get
 import { run } from './run.js';
 import { notice } from '@actions/core';
 
-async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string) {
+async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string) {
     // Clean Scratch Directory
     await fs.rm(scratchDir, { recursive: true, force: true });
     await fs.mkdir(scratchDir, { recursive: true });
@@ -29,7 +29,7 @@ async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scra
 
     // Prepare Dancefile to Access Caches
     const dancefileContent = `
-FROM busybox:1
+FROM ${containerImage}
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     --mount=type=bind,source=.,target=/var/dance-cache \
@@ -54,9 +54,10 @@ RUN --mount=${mountArgs} \
 export async function injectCaches(opts: Opts) {
     const cacheMap = getCacheMap(opts);
     const scratchDir = opts['scratch-dir'];
+    const containerImage = opts['utility-image'];
 
     // Inject Caches for each source-target pair
     for (const [cacheSource, cacheOptions] of Object.entries(cacheMap)) {
-        await injectCache(cacheSource, cacheOptions, scratchDir);
+        await injectCache(cacheSource, cacheOptions, scratchDir, containerImage);
     }
 }

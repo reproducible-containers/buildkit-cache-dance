@@ -19,6 +19,9 @@ inputs:
   save-always:
     default: "false"
     description: "Run the post step to save the cache even if another step before fails"
+  utility-image:
+    default: "ghcr.io/containerd/busybox:latest"
+    description: "The container image to use for injecting and extracting the cache"
 runs:
   using: 'node20'
   main: 'dist/index.js'
