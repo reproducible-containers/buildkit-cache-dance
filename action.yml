@@ -22,6 +22,9 @@ inputs:
   utility-image:
     default: "ghcr.io/containerd/busybox:latest"
     description: "The container image to use for injecting and extracting the cache"
+  builder:
+    default: default
+    description: "The name of the builder. Default: 'default'"
 runs:
   using: 'node20'
   main: 'dist/index.js'

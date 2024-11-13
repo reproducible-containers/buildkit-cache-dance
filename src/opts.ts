@@ -7,6 +7,7 @@ export type Opts = {
   "scratch-dir": string
   "skip-extraction": boolean
   "utility-image": string
+  "builder"?: string
   help: boolean
   /** @deprecated Use `cache-map` instead */
   "cache-source"?: string
@@ -22,9 +23,10 @@ export function parseOpts(args: string[]): mri.Argv<Opts> {
       "skip-extraction": (getInput("skip-extraction") || "false") === "true",
       "extract": process.env[`STATE_POST`] !== undefined,
       "utility-image": getInput("utility-image") || "ghcr.io/containerd/busybox:latest",
+      "builder": getInput("builder") || "default",
       "help": false,
     },
-    string: ["cache-map", "scratch-dir", "cache-source", "cache-target", "utility-image"],
+    string: ["cache-map", "scratch-dir", "cache-source", "cache-target", "utility-image", "builder"],
     boolean: ["skip-extraction", "help", "extract"],
     alias: {
       "help": ["h"],
@@ -52,6 +54,7 @@ Options:
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
   --utility-image  The container image to use for injecting and extracting the cache. Default: 'ghcr.io/containerd/busybox:latest'
+  --builder      The name of the buildx builder to use for the cache injection
   --help         Show this help
 `);
 }
@@ -127,4 +130,8 @@ export function getMountArgsString(cacheOptions: CacheOptions): string {
     const otherOptions = Object.entries(cacheOptions).map(([key, value]) => `${key}=${value}`).join(",");
     return `type=cache,${otherOptions}`;
   }
+}
+
+export function getBuilder(opts: Opts): string {
+    return opts["builder"] == null || opts["builder"] == "" ? "default" : opts["builder"];
 }
