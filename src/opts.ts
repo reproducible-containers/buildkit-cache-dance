@@ -1,7 +1,7 @@
 import mri from 'mri';
 import fs from 'fs';
 import { getInput, warning } from '@actions/core';
-import { DockerfileParser, ModifiableInstruction } from 'dockerfile-ast'
+import { DockerfileParser, ModifiableInstruction } from 'dockerfile-ast';
 
 export type Opts = {
   "extract": boolean
@@ -99,12 +99,12 @@ function getCacheMapFromDockerfile(dockerfilePath: string): CacheMap {
         cacheMap[id] = {
           id,
           target,
-        }
+        };
       }
     }
   }
 
-  return cacheMap
+  return cacheMap;
 }
 
 export function getCacheMap(opts: Opts): CacheMap {
