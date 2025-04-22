@@ -111,7 +111,10 @@ export function getCacheMap(opts: Opts): CacheMap {
       return cacheMap;
     }
 
-    return getCacheMapFromDockerfile(opts["dockerfile"]);
+    console.log(`No cache map provided. Trying to parse the Dockerfile to find the cache mount instructions...`);
+    const cacheMapFromDockerfile = getCacheMapFromDockerfile(opts["dockerfile"]);
+    console.log(`Cache map parsed from Dockerfile: ${JSON.stringify(cacheMapFromDockerfile)}`);
+    return cacheMapFromDockerfile;
   } catch (e) {
     throw new Error(`Failed to parse cache map. Expected JSON, got:\n${opts["cache-map"]}\n${e}`);
   }
