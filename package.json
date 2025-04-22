@@ -31,6 +31,8 @@
   },
   "dependencies": {
     "@actions/core": "~1.5.0",
+    "dockerfile-ast": "^0.7.0",
+    "fs": "0.0.1-security",
     "mri": "^1.2.0",
     "spawn-please": "^3.0.0"
   },
