@@ -80,21 +80,18 @@ function getCacheMapFromDockerfile(dockerfilePath: string): CacheMap {
 
   const runInstructions = dockerfile.getInstructions().filter(i => i.getKeyword() == 'RUN') as Array<ModifiableInstruction>;
   for (const run of runInstructions) {
-    const currentWorkdir = dockerfile.getAvailableWorkingDirectories(run.getRange().end.line).pop();
     for (const flag of run.getFlags()) {
       if (flag.getName() == 'mount' && flag.getOption('type')?.getValue() == 'cache') {
-        const cacheTarget = flag.getOption('target')?.getValue();
-        if (cacheTarget == null) {
-          throw new Error('cache mount must define target: ' + flag.toString() + ' in ' + run.toString());
-        }
-        if (!cacheTarget.startsWith('/') && !currentWorkdir) {
-          throw new Error('cache mount target must be absolute path or WORKDIR must be set before: ' + flag.toString() + ' in ' + run.toString());
-        }
-
         // Extract the `id` flag which defaults to `target` when `id` is not set
         // https://docs.docker.com/reference/dockerfile/#run---mounttypecache
-        const id = flag.getOption('id')?.getValue() || cacheTarget;
-        const target = cacheTarget?.startsWith('/') ? cacheTarget : currentWorkdir + cacheTarget;
+        const id = flag.getOption('id')?.getValue() || flag.getOption('target')?.getValue();
+        if (id == null) {
+          throw new Error('cache mount must define id or target: ' + flag.toString() + ' in ' + run.toString());
+        }
+
+        // The target in this action does not matter as long as it is
+        // different than /var/dance-cache of course
+        const target = "/var/cache-target";
 
         cacheMap[id] = {
           id,

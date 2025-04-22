@@ -164,19 +164,19 @@ RUN --mount=type=cache,id=cache3,target=cache \
         {
             '/tmp/cache': {
                 'id': '/tmp/cache',
-                'target': '/tmp/cache'
+                'target': '/var/cache-target'
             },
             'cache1': {
                 'id': 'cache1',
-                'target': '/app/cache1'
+                'target': '/var/cache-target'
             },
             'cache2': {
                 'id': 'cache2',
-                'target': '/tmp/cache'
+                'target': '/var/cache-target'
             },
             'cache3': {
                 'id': 'cache3',
-                'target': '/app2/cache'
+                'target': '/var/cache-target'
             }
         }
     )
