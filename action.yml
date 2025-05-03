@@ -2,8 +2,10 @@ name: Inject/Extract Cache
 description: "Injects the cached data into the docker build(x|kit) process"
 inputs:
   cache-map:
-    required: true
-    description: "The map of actions source paths to container destination paths or mount arguments"
+    description: "The map of actions source paths to container destination paths or mount arguments. If not provided, the Dockerfile will be used to determine the cache paths."
+  dockerfile:
+    description: "The Dockerfile to use for the auto-discovery of cache-map. Default: `Dockerfile`"
+    default: "Dockerfile"
   cache-source:
     deprecationMessage: "Use `cache-map` instead"
     description: "Where the cache is stored in the calling workspace. Default: `cache`"
