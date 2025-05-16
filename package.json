@@ -41,6 +41,8 @@
   "packageManager": "pnpm@10.11.0",
   "targets": {
     "dist": {
+      "context": "node",
+      "outputFormat": "esmodule",
       "source": "src/index.ts",
       "distDir": "dist",
       "isLibrary": false,
