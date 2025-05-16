@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { promises as fs } from "fs";
 import path from 'path';
 import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getUID, getGID, getBuilder } from './opts.js';
 import { run } from './run.js';
@@ -52,7 +52,7 @@ RUN --mount=${mountArgs} \
 
 
 export async function injectCaches(opts: Opts) {
-    const cacheMap = getCacheMap(opts);
+    const cacheMap = await getCacheMap(opts);
     const scratchDir = opts['scratch-dir'];
     const containerImage = opts['utility-image'];
 

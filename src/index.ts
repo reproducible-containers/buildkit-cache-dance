@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+import { promises as fs } from "fs";
 import os from "os";
 import { injectCaches } from "./inject-cache.js";
 import { extractCaches } from "./extract-cache.js";

@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { getCacheMap, getTargetPath, getMountArgsString, parseOpts, getUID, getGID } from '../src/opts.js'
-import fs from 'fs'
+import { promises as fs } from 'fs'
 
 test('parseOpts with no arguments', () => {
     const opts = parseOpts([])
@@ -116,22 +116,22 @@ test('parseOpts with help argument', () => {
     })
 })
 
-test('getCacheMap', () => {
+test('getCacheMap', async () => {
     const opts = parseOpts(['--cache-map', '{"key": "value"}'])
-    const cacheMap = getCacheMap(opts)
+    const cacheMap = await getCacheMap(opts)
     expect(cacheMap).toEqual({ key: 'value' })
 })
 
-test('getCacheMap with both cache-map and dockerfile specified', () => {
+test('getCacheMap with both cache-map and dockerfile specified', async () => {
     const opts = parseOpts(['--cache-map', '{"key": "value"}', '--dockerfile', 'Dockerfile.custom'])
-    const cacheMap = getCacheMap(opts)
+    const cacheMap = await getCacheMap(opts)
     expect(cacheMap).toEqual({ key: 'value' })
 })
 
-test('getCacheMapFromDockerfile', () => {
-    const tmpDir = fs.mkdtempSync('/tmp/dockerfile-test-');
+test('getCacheMapFromDockerfile', async () => {
+    const tmpDir = await fs.mkdtemp('/tmp/dockerfile-test-');
     const dockerfilePath = `${tmpDir}/Dockerfile`
-    fs.writeFileSync(dockerfilePath, `
+    await fs.writeFile(dockerfilePath, `
 FROM alpine:latest AS builder
 
 # Target absolute path, no id
@@ -157,8 +157,8 @@ RUN --mount=type=cache,id=cache3,target=cache \
 `);
 
     const opts = parseOpts(['--dockerfile', dockerfilePath])
-    const cacheMap = getCacheMap(opts)
-    fs.rmSync(tmpDir, { recursive: true })
+    const cacheMap = await getCacheMap(opts)
+    await fs.rm(tmpDir, { recursive: true })
 
     expect(cacheMap).toEqual(
         {
@@ -182,9 +182,9 @@ RUN --mount=type=cache,id=cache3,target=cache \
     )
 })
 
-test('getCacheMap with invalid JSON', () => {
+test('getCacheMap with invalid JSON', async() => {
     const opts = parseOpts(['--cache-map', 'invalid'])
-    expect(() => getCacheMap(opts)).toThrowError()
+    await expect(getCacheMap(opts)).rejects.toThrowError()
 })
 
 test('getTargetPath with string', () => {
