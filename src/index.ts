@@ -23,12 +23,11 @@ async function main(args: string[]) {
   }
 }
 
-try {
-  await main(process.argv);
-} catch (err) {
-  console.error(err);
-  if (err instanceof Error) {
-    console.error(err.stack);
-  }
-  process.exit(1);
-}
+main(process.argv)
+    .catch(err => {
+        console.error(err);
+        if (err instanceof Error) {
+            console.error(err.stack);
+        }
+        process.exit(1);
+    });

@@ -5,8 +5,11 @@
   "main": "dist/index.js",
   "source": "src/index.ts",
   "type": "module",
+  "bin": {
+    "buildkit-cache-dance": "dist/index.js"
+  },
   "scripts": {
-    "build": "parcel build",
+    "build": "parcel build --target dist",
     "prepare": "npm run build",
     "test": "vitest"
   },
@@ -37,9 +40,13 @@
   },
   "packageManager": "pnpm@10.11.0",
   "targets": {
-    "main": {
+    "dist": {
+      "source": "src/index.ts",
+      "distDir": "dist",
+      "isLibrary": false,
       "includeNodeModules": true,
-      "optimize": false
+      "optimize": true,
+      "scopeHoist": false
     }
   }
 }
