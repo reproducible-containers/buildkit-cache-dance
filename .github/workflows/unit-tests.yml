@@ -18,9 +18,7 @@ jobs:
         with:
           node-version: 20
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 8
+      - uses: pnpm/action-setup@v4
 
       - name: Install and Build
         run: pnpm i
