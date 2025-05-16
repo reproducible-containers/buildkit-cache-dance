@@ -1,6 +1,6 @@
 import mri from 'mri';
 import { promises as fs } from 'fs';
-import { getInput, warning } from '@actions/core';
+import { getInput, warning } from '@actions/core/lib/core.js';
 import { DockerfileParser, ModifiableInstruction } from 'dockerfile-ast';
 
 export type Opts = {

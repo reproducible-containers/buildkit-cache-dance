@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from 'path';
 import { CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getUID, getGID, getBuilder } from './opts.js';
 import { run } from './run.js';
-import { notice } from '@actions/core';
+import { notice } from '@actions/core/lib/core.js';
 
 async function injectCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string, builder: string) {
     // Clean Scratch Directory
