@@ -1,6 +1,6 @@
 import mri from 'mri';
-import fs from 'fs';
-import { getInput, warning } from '@actions/core';
+import { promises as fs } from 'fs';
+import { getInput, warning } from '@actions/core/lib/core.js';
 import { DockerfileParser, ModifiableInstruction } from 'dockerfile-ast';
 
 export type Opts = {
@@ -72,8 +72,8 @@ export type ToStringable = {
 export type CacheOptions = TargetPath | { target: TargetPath } & Record<string, ToStringable>
 export type CacheMap = Record<SourcePath, CacheOptions>
 
-function getCacheMapFromDockerfile(dockerfilePath: string): CacheMap {
-  const dockerfileContent = fs.readFileSync(dockerfilePath, "utf-8");
+async function getCacheMapFromDockerfile(dockerfilePath: string): Promise<CacheMap> {
+  const dockerfileContent = await fs.readFile(dockerfilePath, "utf-8");
   const dockerfile = DockerfileParser.parse(dockerfileContent);
 
   const cacheMap: CacheMap = {};
@@ -104,7 +104,7 @@ function getCacheMapFromDockerfile(dockerfilePath: string): CacheMap {
   return cacheMap;
 }
 
-export function getCacheMap(opts: Opts): CacheMap {
+export async function getCacheMap(opts: Opts): Promise<CacheMap> {
   try {
     const cacheMap = JSON.parse(opts["cache-map"]) as CacheMap;
     if (Object.keys(cacheMap).length !== 0) {
@@ -112,7 +112,7 @@ export function getCacheMap(opts: Opts): CacheMap {
     }
 
     console.log(`No cache map provided. Trying to parse the Dockerfile to find the cache mount instructions...`);
-    const cacheMapFromDockerfile = getCacheMapFromDockerfile(opts["dockerfile"]);
+    const cacheMapFromDockerfile = await getCacheMapFromDockerfile(opts["dockerfile"]);
     console.log(`Cache map parsed from Dockerfile: ${JSON.stringify(cacheMapFromDockerfile)}`);
     return cacheMapFromDockerfile;
   } catch (e) {

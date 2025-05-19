@@ -5,10 +5,13 @@
   "main": "dist/index.js",
   "source": "src/index.ts",
   "type": "module",
+  "bin": {
+    "buildkit-cache-dance": "dist/index.js"
+  },
   "scripts": {
-    "build": "parcel build",
+    "build": "parcel build --target dist --detailed-report",
     "prepare": "npm run build",
-    "test": "vitest"
+    "test": "node --enable-source-maps ./node_modules/vitest/vitest.mjs "
   },
   "keywords": [
     "buildkit",
@@ -24,22 +27,28 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "parcel": "^2.12.0",
-    "typescript": "^5.4.3",
-    "vitest": "^1.4.0"
+    "@types/node": "^22.15.18",
+    "parcel": "^2.15.1",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
   },
   "dependencies": {
-    "@actions/core": "~1.5.0",
+    "@actions/core": "=1.8.0",
     "dockerfile-ast": "^0.7.0",
-    "fs": "0.0.1-security",
     "mri": "^1.2.0",
     "spawn-please": "^3.0.0"
   },
+  "packageManager": "pnpm@10.11.0",
   "targets": {
-    "main": {
+    "dist": {
+      "context": "node",
+      "outputFormat": "esmodule",
+      "source": "src/index.ts",
+      "distDir": "dist",
+      "isLibrary": false,
       "includeNodeModules": true,
-      "optimize": false
+      "optimize": true,
+      "scopeHoist": false
     }
   }
 }

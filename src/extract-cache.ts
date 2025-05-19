@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import { promises as fs } from 'fs';
 import path from 'path';
 import {CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getBuilder} from './opts.js';
 import { run, runPiped } from './run.js';
@@ -52,7 +52,7 @@ export async function extractCaches(opts: Opts) {
         return;
     }
 
-    const cacheMap = getCacheMap(opts);
+    const cacheMap = await getCacheMap(opts);
     const scratchDir = opts['scratch-dir'];
     const containerImage = opts['utility-image'];
     const builder = getBuilder(opts);
