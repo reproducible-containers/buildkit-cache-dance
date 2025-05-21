@@ -44,6 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
+        id: setup-buildx
       - uses: docker/metadata-action@v5
         id: meta
         with:
@@ -61,6 +62,7 @@ jobs:
       - name: inject cache into docker
         uses: reproducible-containers/buildkit-cache-dance@v3.1.0
         with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
           cache-map: |
             {
               "var-cache-apt": "/var/cache/apt",
