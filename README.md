@@ -136,6 +136,7 @@ Options:
   --extract      Extract the cache from the docker container (extract step). Otherwise, inject the cache (main step)
   --cache-map    The map of actions source to container destination paths for the cache paths
   --dockerfile   The Dockerfile to use for the auto-discovery of cache-map. Default: 'Dockerfile'
+  --cache-dir    The root directory where cache content is injected from/extracted to when using auto-discovery of the cache-map.
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
   --builder     The name of the buildx builder. Default: 'default'
