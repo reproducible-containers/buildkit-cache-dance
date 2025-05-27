@@ -19,6 +19,7 @@ This action be used for "non-reproducible" containers too.
 ### apt-get GitHub Actions
 
 Dockerfile:
+
 ```dockerfile
 FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
@@ -32,6 +33,7 @@ RUN \
 ```
 
 Action:
+
 ```yaml
 ---
 name: Build
@@ -51,23 +53,18 @@ jobs:
           images: Build
 
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache
         with:
-          path: |
-            var-cache-apt
-            var-lib-apt
-          key: cache-${{ hashFiles('.github/workflows/test/Dockerfile') }}
+          path: cache-mount
+          key: cache-mount-${{ hashFiles('Dockerfile') }}
 
-      - name: inject cache into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+      - name: Restore Docker cache mounts
+        uses: reproducible-containers/buildkit-cache-dance@v3
         with:
           builder: ${{ steps.setup-buildx.outputs.name }}
-          cache-map: |
-            {
-              "var-cache-apt": "/var/cache/apt",
-              "var-lib-apt": "/var/lib/apt"
-            }
+          cache-dir: cache-mount
+          dockerfile: Dockerfile
           skip-extraction: ${{ steps.cache.outputs.cache-hit }}
 
       - name: Build and push
@@ -89,12 +86,28 @@ Real-world examples:
 
 ## CacheMap Options
 
-Optionally, instead of a single string for the `target`, you can provide an object with additional options that should be passed to `--mount=type=cache` in the values `cache-map` JSON. The `target` path must be present in the object as a property.
+If you require more fine grained control you can manually specify a JSON formatted `cache-map`. The keys specify the paths on the Docker builder host to use as the bind source and the string value provides the cache mount `target` within the Docker build:
 
 ```yaml
-      - name: inject cache into docker
-        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+      - name: Restore Docker cache mounts
+        uses: reproducible-containers/buildkit-cache-dance@v3
         with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          cache-map: |
+            {
+              "var-cache-apt": "/var/cache/apt",
+              "var-lib-apt": "/var/lib/apt"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+```
+
+Alternatively, you can provide a JSON object with additional options that should be passed to `--mount=type=cache` in the values `cache-map` JSON. The `target` path must be present in the object as a property.
+
+```yaml
+      - name: Restore Docker cache mounts
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
           cache-map: |
             {
               "var-cache-apt": {
