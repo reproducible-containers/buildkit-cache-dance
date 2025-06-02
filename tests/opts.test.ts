@@ -8,6 +8,7 @@ test('parseOpts with no arguments', () => {
         "_": [],
         "cache-map": "{}",
         "dockerfile": "Dockerfile",
+        "cache-dir": null,
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -24,6 +25,7 @@ test('parseOpts with cache-map argument', () => {
         "_": [],
         "cache-map": '{"key": "value"}',
         "dockerfile": "Dockerfile",
+        "cache-dir": null,
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -40,6 +42,7 @@ test('parseOpts with deprecated cache-source and cache-target arguments', () => 
         "_": [],
         "cache-map": '{"source":"target"}',
         "dockerfile": "Dockerfile",
+        "cache-dir": null,
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -58,6 +61,7 @@ test('parseOpts with utility-image argument', () => {
         "_": [],
         "cache-map": '{}',
         "dockerfile": "Dockerfile",
+        "cache-dir": null,
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -74,6 +78,7 @@ test('parseOpts with builder argument', () => {
         "_": [],
         "cache-map": '{}',
         "dockerfile": "Dockerfile",
+        "cache-dir": null,
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -90,6 +95,24 @@ test('parseOpts with dockerfile argument', () => {
         "_": [],
         "cache-map": "{}",
         "dockerfile": "Dockerfile.custom",
+        "cache-dir": null,
+        "scratch-dir": "scratch",
+        "skip-extraction": false,
+        "extract": false,
+        "h": false,
+        "help": false,
+        "utility-image": "ghcr.io/containerd/busybox:latest",
+        "builder": "default"
+    })
+})
+
+test('parseOpts with cache-dir argument', () => {
+    const opts = parseOpts(['--cache-dir', '/tmp/cache'])
+    expect(opts).toEqual({
+        "_": [],
+        "cache-map": "{}",
+        "dockerfile": "Dockerfile",
+        "cache-dir": "/tmp/cache",
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -106,6 +129,7 @@ test('parseOpts with help argument', () => {
         "_": [],
         "cache-map": "{}",
         "dockerfile": "Dockerfile",
+        "cache-dir": null,
         "scratch-dir": "scratch",
         "skip-extraction": false,
         "extract": false,
@@ -128,10 +152,7 @@ test('getCacheMap with both cache-map and dockerfile specified', async () => {
     expect(cacheMap).toEqual({ key: 'value' })
 })
 
-test('getCacheMapFromDockerfile', async () => {
-    const tmpDir = await fs.mkdtemp('/tmp/dockerfile-test-');
-    const dockerfilePath = `${tmpDir}/Dockerfile`
-    await fs.writeFile(dockerfilePath, `
+const DOCKERFILE_CONTENT = `
 FROM alpine:latest AS builder
 
 # Target absolute path, no id
@@ -154,11 +175,16 @@ RUN --mount=type=cache,id=cache2,target=/tmp/cache \
 WORKDIR /app2
 RUN --mount=type=cache,id=cache3,target=cache \
     echo "Hello, World!" > cache/hello.txt
-`);
+`
+
+test('getCacheMapFromDockerfile without bindRoot', async ({ onTestFinished }) => {
+    const tmpDir = await fs.mkdtemp('/tmp/dockerfile-test-')
+    onTestFinished(() => fs.rm(tmpDir, { recursive: true }))
+    const dockerfilePath = `${tmpDir}/Dockerfile`
+    await fs.writeFile(dockerfilePath, DOCKERFILE_CONTENT);
 
     const opts = parseOpts(['--dockerfile', dockerfilePath])
     const cacheMap = await getCacheMap(opts)
-    await fs.rm(tmpDir, { recursive: true })
 
     expect(cacheMap).toEqual(
         {
@@ -180,7 +206,39 @@ RUN --mount=type=cache,id=cache3,target=cache \
             }
         }
     )
-})
+});
+
+test('getCacheMapFromDockerfile with bindRoot', async ({ onTestFinished }) => {
+    const tmpDir = await fs.mkdtemp('/tmp/dockerfile-test-')
+    onTestFinished(() => fs.rm(tmpDir, { recursive: true }))
+    const dockerfilePath = `${tmpDir}/Dockerfile`
+    const cacheDir: string = `${tmpDir}/cache-mount`
+    await fs.writeFile(dockerfilePath, DOCKERFILE_CONTENT);
+
+    const opts = parseOpts(['--dockerfile', dockerfilePath, '--cache-dir', cacheDir])
+    const cacheMap = await getCacheMap(opts)
+
+    expect(cacheMap).toEqual(
+        {
+            [`${cacheDir}//tmp/cache`]: {
+                'id': '/tmp/cache',
+                'target': '/var/cache-target'
+            },
+            [`${cacheDir}/cache1`]: {
+                'id': 'cache1',
+                'target': '/var/cache-target'
+            },
+            [`${cacheDir}/cache2`]: {
+                'id': 'cache2',
+                'target': '/var/cache-target'
+            },
+            [`${cacheDir}/cache3`]: {
+                'id': 'cache3',
+                'target': '/var/cache-target'
+            }
+        }
+    )
+});
 
 test('getCacheMap with invalid JSON', async() => {
     const opts = parseOpts(['--cache-map', 'invalid'])

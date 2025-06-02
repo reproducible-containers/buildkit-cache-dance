@@ -4,8 +4,11 @@ inputs:
   cache-map:
     description: "The map of actions source paths to container destination paths or mount arguments. If not provided, the Dockerfile will be used to determine the cache paths."
   dockerfile:
-    description: "The Dockerfile to use for the auto-discovery of cache-map. Default: `Dockerfile`"
+    description: "The Dockerfile to use for auto-discovery of the cache-map. Default: `Dockerfile`"
     default: "Dockerfile"
+  cache-dir:
+    description: "The root directory where cache content is injected from/extracted to when using auto-discovery of the cache-map. If not provided, each cache mount `target` will be used as a source path."
+    default: ""
   cache-source:
     deprecationMessage: "Use `cache-map` instead"
     description: "Where the cache is stored in the calling workspace. Default: `cache`"

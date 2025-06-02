@@ -7,6 +7,7 @@ export type Opts = {
   "extract": boolean
   "cache-map": string
   "dockerfile": string
+  "cache-dir": string | null
   "scratch-dir": string
   "skip-extraction": boolean
   "utility-image": string
@@ -23,6 +24,7 @@ export function parseOpts(args: string[]): mri.Argv<Opts> {
     default: {
       "cache-map": getInput("cache-map") || "{}",
       "dockerfile": getInput("dockerfile") || "Dockerfile",
+      "cache-dir": getInput("cache-dir") || null,
       "scratch-dir": getInput("scratch-dir") || "scratch",
       "skip-extraction": (getInput("skip-extraction") || "false") === "true",
       "extract": process.env[`STATE_POST`] !== undefined,
@@ -30,7 +32,7 @@ export function parseOpts(args: string[]): mri.Argv<Opts> {
       "builder": getInput("builder") || "default",
       "help": false,
     },
-    string: ["cache-map", "dockerfile", "scratch-dir", "cache-source", "cache-target", "utility-image", "builder"],
+    string: ["cache-map", "dockerfile", "cache-dir", "scratch-dir", "cache-source", "cache-target", "utility-image", "builder"],
     boolean: ["skip-extraction", "help", "extract"],
     alias: {
       "help": ["h"],
@@ -55,7 +57,8 @@ Save 'RUN --mount=type=cache' caches on GitHub Actions or other CI platforms
 Options:
   --extract      Extract the cache from the docker container (extract step). Otherwise, inject the cache (main step)
   --cache-map    The map of actions source paths to container destination paths or mount arguments
-  --dockerfile   The Dockerfile to use for the auto-discovery of cache-map. Default: 'Dockerfile'
+  --dockerfile   The Dockerfile to use for auto-discovery of the cache-map. Default: 'Dockerfile'
+  --cache-dir    The root directory where cache content is injected from/extracted to when using auto-discovery of the cache-map.
   --scratch-dir  Where the action is stores some temporary files for its processing. Default: 'scratch'
   --skip-extraction  Skip the extraction of the cache from the docker container
   --utility-image  The container image to use for injecting and extracting the cache. Default: 'ghcr.io/containerd/busybox:latest'
@@ -72,7 +75,7 @@ export type ToStringable = {
 export type CacheOptions = TargetPath | { target: TargetPath } & Record<string, ToStringable>
 export type CacheMap = Record<SourcePath, CacheOptions>
 
-async function getCacheMapFromDockerfile(dockerfilePath: string): Promise<CacheMap> {
+async function getCacheMapFromDockerfile(dockerfilePath: string, bindRoot: string | null): Promise<CacheMap> {
   const dockerfileContent = await fs.readFile(dockerfilePath, "utf-8");
   const dockerfile = DockerfileParser.parse(dockerfileContent);
 
@@ -89,11 +92,14 @@ async function getCacheMapFromDockerfile(dockerfilePath: string): Promise<CacheM
           throw new Error('cache mount must define id or target: ' + flag.toString() + ' in ' + run.toString());
         }
 
+        // The directory on the host to inject/extract the cache mount data from
+        const bindDir = bindRoot !== null ? `${bindRoot}/${id}` : id
+
         // The target in this action does not matter as long as it is
         // different than /var/dance-cache of course
         const target = "/var/cache-target";
 
-        cacheMap[id] = {
+        cacheMap[bindDir] = {
           id,
           target,
         };
@@ -112,7 +118,7 @@ export async function getCacheMap(opts: Opts): Promise<CacheMap> {
     }
 
     console.log(`No cache map provided. Trying to parse the Dockerfile to find the cache mount instructions...`);
-    const cacheMapFromDockerfile = await getCacheMapFromDockerfile(opts["dockerfile"]);
+    const cacheMapFromDockerfile = await getCacheMapFromDockerfile(opts["dockerfile"], opts["cache-dir"]);
     console.log(`Cache map parsed from Dockerfile: ${JSON.stringify(cacheMapFromDockerfile)}`);
     return cacheMapFromDockerfile;
   } catch (e) {
