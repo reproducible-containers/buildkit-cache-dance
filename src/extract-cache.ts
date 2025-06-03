@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import {CacheOptions, Opts, getCacheMap, getMountArgsString, getTargetPath, getBuilder} from './opts.js';
-import { run, runPiped } from './run.js';
+import { CacheOptions, Opts, getBuilder, getCacheMap, getMountArgsString, getTargetPath } from './opts.js';
+import { run } from './run.js';
 
 async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scratchDir: string, containerImage: string, builder: string) {
     // Prepare Timestamp for Layer Cache Busting
@@ -15,35 +15,19 @@ async function extractCache(cacheSource: string, cacheOptions: CacheOptions, scr
     const mountArgs = getMountArgsString(cacheOptions);
 
     const dancefileContent = `
-FROM ${containerImage}
+FROM ${containerImage} AS dance-extract
 COPY buildstamp buildstamp
 RUN --mount=${mountArgs} \
     mkdir -p /var/dance-cache/ \
     && cp -p -R ${targetPath}/. /var/dance-cache/ || true
+FROM scratch
+COPY --from=dance-extract /var/dance-cache /
 `;
     await fs.writeFile(path.join(scratchDir, 'Dancefile.extract'), dancefileContent);
     console.log(dancefileContent);
 
-    // Extract Data into Docker Image
-    await run('docker', ['buildx', 'build', '--builder', builder, '-f', path.join(scratchDir, 'Dancefile.extract'), '--tag', 'dance:extract', '--load', scratchDir]);
-
-    // Create Extraction Image
-    try {
-        await run('docker', ['rm', '-f', 'cache-container']);
-    } catch (error) {
-        // Ignore error if container does not exist
-    }
-    await run('docker', ['create', '-ti', '--name', 'cache-container', 'dance:extract']);
-
-    // Unpack Docker Image into Scratch
-    await runPiped(
-        ['docker', ['cp', '-L', 'cache-container:/var/dance-cache', '-']],
-        ['tar', ['-H', 'posix', '-x', '-C', scratchDir]]
-    );
-
-    // Move Cache into Its Place
-    await run('sudo', ['rm', '-rf', cacheSource]);
-    await fs.rename(path.join(scratchDir, 'dance-cache'), cacheSource);
+    // Extract cache
+    await run('docker', ['buildx', 'build', '--builder', builder, '-f', path.join(scratchDir, 'Dancefile.extract'), '--tag', 'dance:extract', '--output', `type=local,dest=${cacheSource}`, scratchDir]);
 }
 
 export async function extractCaches(opts: Opts) {
