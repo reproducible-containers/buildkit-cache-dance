@@ -31,7 +31,7 @@ inputs:
     default: ""
     description: "The name of the buildx builder to use. If not specified, the currently active builder is used."
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
   post: 'dist/index.js'
   post-if: 'success() || github.event.inputs.save-always'
