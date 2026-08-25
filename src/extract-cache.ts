@@ -41,8 +41,26 @@ RUN --mount=${mountArgs} \
         ['tar', ['-H', 'posix', '-x', '-C', scratchDir]]
     );
 
-    // Move Cache into Its Place
-    await run('sudo', ['rm', '-rf', cacheSource]);
+    // Replace old cache with newly extracted cache
+    try {
+        await fs.rm(cacheSource, { recursive: true, force: true });
+    } catch (err: any) {
+        if (err?.code === 'EACCES' || err?.code === 'EPERM') {
+            // Use a container w/ bind mount to remove the cache directory
+            console.log(`fs.rm failed with ${err.code} on ${cacheSource}, falling back to Docker container for cache removal...`);
+            const absSource = path.resolve(cacheSource);
+            console.log(`Running: docker run --rm --mount type=bind,source=${path.dirname(absSource)},target=/host-parent ${containerImage} rm -rf /host-parent/${path.basename(absSource)}`);
+            await run('docker', [
+                'run', '--rm',
+                '--mount', `type=bind,source=${path.dirname(absSource)},target=/host-parent`,
+                containerImage,
+                'rm', '-rf', `/host-parent/${path.basename(absSource)}`
+            ]);
+            console.log(`Docker container cache removal completed for ${cacheSource}`);
+        } else {
+            throw err;
+        }
+    }
     await fs.rename(path.join(scratchDir, 'dance-cache'), cacheSource);
 }
 
